@@ -1,4 +1,4 @@
-package it.einjojo.akani.boss.world;
+package it.einjojo.akani.boss.room;
 
 import it.einjojo.akani.boss.util.FileUtil;
 import org.bukkit.Bukkit;
@@ -15,13 +15,43 @@ import java.util.stream.Stream;
 
 public class RoomManager {
     private final JavaPlugin plugin;
+    private final Path templatesFolder;
     private final List<Room> loadedRooms = new LinkedList<>();
     private final Map<String, RoomTemplate> roomTemplates = new HashMap<>();
 
     public RoomManager(JavaPlugin plugin) {
         this.plugin = plugin;
+        templatesFolder = plugin.getDataFolder().toPath().resolve("templates");
     }
 
+
+    public void load() {
+        plugin.getLogger().info("Loading room templates...");
+        if (!Files.exists(templatesFolder)) {
+            plugin.getLogger().info("Templates folder does not exist, creating...");
+            try {
+                Files.createDirectories(templatesFolder);
+            } catch (IOException e) {
+                plugin.getLogger().severe("Failed to create templates folder: " + e.getMessage());
+                return;
+            }
+        }
+        try (Stream<Path> stream = Files.walk(templatesFolder, 1)) {
+            for (Iterator<Path> it = stream.iterator(); it.hasNext(); ) {
+                Path path = it.next();
+                if (path.equals(templatesFolder)) continue;
+                if (Files.isDirectory(path)) {
+                    RoomTemplate template = new RoomTemplate(path.getFileName().toString(), path);
+                    roomTemplates.put(template.templateName(), template);
+                    plugin.getLogger().info("Loaded room template: " + template.templateName());
+                } else {
+                    plugin.getLogger().warning("Ignoring file in templates folder: " + path.getFileName());
+                }
+            }
+        } catch (IOException e) {
+            plugin.getLogger().warning("Failed to load room templates: " + e.getMessage());
+        }
+    }
 
     /**
      * Creates or gets a room by the room template

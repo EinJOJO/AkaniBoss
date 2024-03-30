@@ -8,7 +8,7 @@ voraxen = "1.168.0"
 vhusksync = "3.3.1"
 vcloudnet = "4.0.0-RC9"
 vluckperms = "5.4"
-decentholograms = "2.8.6"
+vdecentholograms = "2.8.6"
 
 
 # Libraries
@@ -44,7 +44,7 @@ cloudnetbridge = { group = "eu.cloudnetservice.cloudnet", name = "bridge", versi
 cloudnetwrapperjvm = { group = "eu.cloudnetservice.cloudnet", name = "wrapper-jvm", version.ref = "vcloudnet" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "vluckperms" }
 boostedyaml = { group = "dev.dejvokep", name = "boosted-yaml", version.ref = "vboostedyaml" }
-decentholograms = { group = "com.github.decentsoftware-eu", name = "decentholograms", version.ref = "decentholograms" }
+decentholograms = { group = "com.github.decentsoftware-eu", name = "decentholograms", version.ref = "vdecentholograms" }
 
 
 [plugins]

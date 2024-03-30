@@ -1,4 +1,4 @@
-package it.einjojo.akani.boss.world;
+package it.einjojo.akani.boss.room;
 
 import it.einjojo.akani.boss.util.FileUtil;
 import org.bukkit.*;

@@ -37,7 +37,9 @@ repositories {
 
 dependencies {
     implementation(libs.guava)
+    implementation(libs.gson)
     compileOnly(libs.paper)
+    compileOnly(libs.decentholograms)
 }
 
 
