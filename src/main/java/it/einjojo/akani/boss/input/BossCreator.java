@@ -36,6 +36,7 @@ public class BossCreator {
             if (step == -1) {
                 return;
             }
+            player.sendMessage("");
             if (step == MAX_STEPS) {
                 akaniBoss.bossManager().registerBoss(bossBuilder.build());
                 player.sendMessage("<green>Der Boss wurde erfolgreich erstellt!");
@@ -69,7 +70,7 @@ public class BossCreator {
                 }
                 case 1 -> {
                     sendMessage(player, "Gib einen <blue>Namen <gray>für den Boss ein.");
-                    sendMessage(player, "<i>z.B < red >Der Böse Mann< / red >");
+                    sendMessage(player, "<gold><i>z.B < red >Der Böse Mann< / red >");
                     new PlayerChatInput(player, ((name) -> {
                         bossBuilder.name(name);
                         sendMessage(player, "<green><i>Name gesetzt: <reset>" + name);
@@ -125,9 +126,10 @@ public class BossCreator {
 
                 }
                 case 5 -> {
-                    player.sendMessage("Von welcher <blue>Template-Welt<gray> soll der Bossraum erstellt werden?");
-                    player.sendMessage("<i><gold>Gib den Namen des Welt-Ordners an.");
-                    player.sendMessage("<i><gold>(Der befindet sich unter: plugins/AkaniBoss/templates/).");
+
+                    sendMessage(player, "Von welcher <blue>Template-Welt<gray> soll der Bossraum erstellt werden?");
+                    sendMessage(player, "<i><gold>Gib den Namen des Welt-Ordners an.");
+                    sendMessage(player, "<i><gold>(Der befindet sich unter: plugins/AkaniBoss/templates/).");
                     new PlayerChatInput(player, ((template) -> {
                         RoomTemplate roomTemplate = akaniBoss.roomManager().roomTemplate(template);
                         if (roomTemplate == null) {
@@ -189,7 +191,7 @@ public class BossCreator {
     }
 
     private String progress() {
-        return "<dark_gray>[ <blue>" + step + "</blue> <gray>/</gray> <white>" + MAX_STEPS + "</white> ] </dark_gray>";
+        return "<dark_gray>[<blue>" + step + 1 + "</blue> <gray>/</gray> <white>" + MAX_STEPS + 1 + "</white>] </dark_gray>";
     }
 
     public void onCancel() {
