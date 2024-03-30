@@ -25,6 +25,11 @@ public class KeyUsedEntranceRequirement implements EntranceRequirement {
     }
 
     @Override
+    public String toString() {
+        return NAME;
+    }
+
+    @Override
     public Component denyMessage(Player player) {
         return null;
     }

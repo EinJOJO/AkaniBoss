@@ -15,7 +15,7 @@ public class BossManager {
     public void registerBoss(Boss boss) {
         bosses.put(boss.id(), boss);
         keyLocToBossIDMap.put(boss.keyRedeemLocation(), boss.id());
-        HologramUtil.createBossHologram(boss.keyRedeemLocation().clone().add(0, 3, 0), boss);
+        HologramUtil.createBossHologram(boss.keyRedeemLocation().clone().toCenterLocation().add(0, 4, 0), boss);
     }
 
     public Map<String, Boss> bosses() {

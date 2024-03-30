@@ -191,7 +191,7 @@ public class BossCreator {
     }
 
     private String progress() {
-        return "<dark_gray>[<blue>" + step + 1 + "</blue> <gray>/</gray> <white>" + MAX_STEPS + 1 + "</white>] </dark_gray>";
+        return "<dark_gray>[<blue>" + (step + 1) + "</blue> <gray>/</gray> <white>" + (MAX_STEPS + 1) + "</white>] </dark_gray>";
     }
 
     public void onCancel() {
