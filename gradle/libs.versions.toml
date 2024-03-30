@@ -1,0 +1,52 @@
+[versions]
+# APIs
+vpaper-api = "1.19.4-R0.1-SNAPSHOT"
+vvelcoity-api = "3.3.0-SNAPSHOT"
+vwaterfall-api = "1.20-R0.1-SNAPSHOT"
+vfawe-bom = "1.42"
+voraxen = "1.168.0"
+vhusksync = "3.3.1"
+vcloudnet = "4.0.0-RC9"
+vluckperms = "5.4"
+decentholograms = "2.8.6"
+
+
+# Libraries
+vboostedyaml = "1.3"
+vpacketevents = "2.2.1"
+vlitecommands = "3.2.0"
+vadventure = "4.16.0"
+vguava = "33.1.0-jre"
+vgson = "2.10.1"
+vcaffeine = "3.1.8"
+vjedis = "5.1.0"
+
+
+# Wandoria Specific
+vdialog-api = "1.2" #https://repo.wandoria.net/#/snapshots/net/wandoria/api/DialogAPI/
+
+[libraries]
+fawe = { group = "com.intellectualsites.bom", name = "bom-newest", version.ref = "vfawe-bom" }
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "vpaper-api" }
+litecommands = { group = "dev.rollczi", name = "litecommands-bukkit", version.ref = "vlitecommands" }
+dialog-api = { group = "net.wandoria.api", name = "dialog-api", version.ref = "vdialog-api" }
+packetevents-spigot = { group = "com.github.retrooper.packetevents", name = "spigot", version.ref = "vpacketevents" }
+packetevents-bungee = { group = "com.github.retrooper.packetevents", name = "bungeecord", version.ref = "vpacketevents" }
+waterfall = { group = "io.github.waterfallmc", name = "waterfall-api", version.ref = "vwaterfall-api" }
+velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "vvelcoity-api" }
+adventure = { group = "net.kyori", name = "adventure-api", version.ref = "vadventure" }
+minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "vadventure" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "vguava" }
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "vcaffeine" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "vgson" }
+jedis = { group = "redis.clients", name = "jedis", version.ref = "vjedis" }
+cloudnetbridge = { group = "eu.cloudnetservice.cloudnet", name = "bridge", version.ref = "vcloudnet" }
+cloudnetwrapperjvm = { group = "eu.cloudnetservice.cloudnet", name = "wrapper-jvm", version.ref = "vcloudnet" }
+luckperms = { group = "net.luckperms", name = "api", version.ref = "vluckperms" }
+boostedyaml = { group = "dev.dejvokep", name = "boosted-yaml", version.ref = "vboostedyaml" }
+decentholograms = { group = "com.github.decentsoftware-eu", name = "decentholograms", version.ref = "decentholograms" }
+
+
+[plugins]
+shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
+runpaper = { id = "xyz.jpenilla.run-paper", version = "2.2.3" }
