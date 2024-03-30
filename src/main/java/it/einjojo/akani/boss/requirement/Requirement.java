@@ -4,6 +4,11 @@ import it.einjojo.akani.boss.boss.Boss;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
+/**
+ * Represents a requirement that a player must meet to enter a boss room.
+ * <p> Gets checked when a player tries to use a key to enter a boss room.
+ * <p> or when he enters the Boss-Room</p>
+ */
 public interface Requirement {
 
     String requirementName();
@@ -20,5 +25,15 @@ public interface Requirement {
      * @return the message to send to the player.
      */
     Component denyMessage(Player player);
+
+    default CheckType checkType() {
+        return CheckType.BOTH;
+    }
+
+    public enum CheckType {
+        KEY_REDEEM,
+        ENTER_ROOM,
+        BOTH,
+    }
 
 }

@@ -1,13 +1,13 @@
 package it.einjojo.akani.boss.boss;
 
 
-import it.einjojo.akani.boss.requirement.EntranceRequirement;
-import it.einjojo.akani.boss.requirement.KeyReedemRequirement;
+import it.einjojo.akani.boss.requirement.Requirement;
 import it.einjojo.akani.boss.requirement.RequirementFactory;
-import it.einjojo.akani.boss.util.BoundaryBox;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BoundingBox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BossBuilder {
@@ -16,12 +16,9 @@ public class BossBuilder {
     private BossDifficulty difficulty = BossDifficulty.NORMAL;
     private int level = 1;
     private Location keyRedeemLocation;
-    private BoundaryBox entranceBox;
+    private BoundingBox entranceBox;
     private String roomTemplateName;
-    private List<EntranceRequirement> entranceRequirements = List.of(
-            RequirementFactory.keyUsedEntranceRequirement()
-    );
-    private List<KeyReedemRequirement> keyRedeemRequirements = List.of();
+    private List<Requirement> requirements = new ArrayList<>(List.of(RequirementFactory.unlockedWithKeyRequirement()));
     private ItemStack keyItem;
 
 
@@ -34,10 +31,9 @@ public class BossBuilder {
         this.difficulty = boss.difficulty();
         this.level = boss.bossLevel();
         this.keyRedeemLocation = boss.keyRedeemLocation();
-        this.entranceBox = boss.entranceBox();
+        this.entranceBox = boss.dungeonEntrance();
         this.roomTemplateName = boss.roomTemplateName();
-        this.entranceRequirements = boss.entranceRequirements();
-        this.keyRedeemRequirements = boss.keyRedeemRequirements();
+        this.requirements = boss.requirements();
     }
 
     public BossBuilder id(String id) {
@@ -65,7 +61,7 @@ public class BossBuilder {
         return this;
     }
 
-    public BossBuilder entranceBox(BoundaryBox entranceBox) {
+    public BossBuilder entranceBox(BoundingBox entranceBox) {
         this.entranceBox = entranceBox;
         return this;
     }
@@ -75,15 +71,16 @@ public class BossBuilder {
         return this;
     }
 
-    public BossBuilder entranceRequirements(List<EntranceRequirement> entranceRequirements) {
-        this.entranceRequirements = entranceRequirements;
+    public BossBuilder addRequirement(Requirement requirement) {
+        this.requirements.add(requirement);
         return this;
     }
 
-    public BossBuilder keyRedeemRequirements(List<KeyReedemRequirement> keyRedeemRequirements) {
-        this.keyRedeemRequirements = keyRedeemRequirements;
+    public BossBuilder requirements(List<Requirement> entranceRequirements) {
+        this.requirements = entranceRequirements;
         return this;
     }
+
 
     public BossBuilder keyItem(ItemStack keyItem) {
         this.keyItem = keyItem;
@@ -96,11 +93,10 @@ public class BossBuilder {
         if (name == null) throw new IllegalStateException("name is null");
         if (roomTemplateName == null) throw new IllegalStateException("roomTemplateName is null");
         if (keyRedeemLocation == null) throw new IllegalStateException("keyRedeemLocation is null");
-        if (entranceBox == null) throw new IllegalStateException("entranceBox is null");
-        if (entranceRequirements == null) throw new IllegalStateException("entranceRequirements is null");
-        if (keyRedeemRequirements == null) throw new IllegalStateException("keyReedem Requirements is null");
+        if (entranceBox == null) throw new IllegalStateException("dungeonEntrance is null");
+        if (requirements == null) throw new IllegalStateException("requirements is null");
         if (keyItem == null) throw new IllegalStateException("keyItem is null");
-        return new Boss(id, name, roomTemplateName, level, difficulty, keyRedeemLocation, entranceRequirements, keyRedeemRequirements, entranceBox, keyItem);
+        return new Boss(id, name, roomTemplateName, level, difficulty, keyRedeemLocation, requirements, entranceBox, keyItem);
     }
 
 }

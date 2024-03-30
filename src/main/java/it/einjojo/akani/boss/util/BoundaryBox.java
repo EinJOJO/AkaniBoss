@@ -1,7 +1,10 @@
 package it.einjojo.akani.boss.util;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+
+import java.util.List;
 
 public record BoundaryBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
     public static BoundaryBox of(Location loc1, Location loc2) {
@@ -15,10 +18,17 @@ public record BoundaryBox(double minX, double minY, double minZ, double maxX, do
         );
     }
 
-    boolean test(Entity entity) {
-        return entity.getLocation().getX() >= minX && entity.getLocation().getX() <= maxX &&
-                entity.getLocation().getY() >= minY && entity.getLocation().getY() <= maxY &&
-                entity.getLocation().getZ() >= minZ && entity.getLocation().getZ() <= maxZ;
+
+
+
+    public boolean test(Entity entity) {
+        return test(entity.getLocation());
+    }
+
+    public boolean test(Location location) {
+        return location.getX() >= minX && location.getX() <= maxX &&
+                location.getY() >= minY && location.getY() <= maxY &&
+                location.getZ() >= minZ && location.getZ() <= maxZ;
     }
 
 

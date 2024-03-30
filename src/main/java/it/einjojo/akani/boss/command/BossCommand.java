@@ -7,12 +7,21 @@ import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import it.einjojo.akani.boss.AkaniBoss;
 import it.einjojo.akani.boss.boss.Boss;
+import it.einjojo.akani.boss.boss.BossBuilder;
+import it.einjojo.akani.boss.boss.BossDifficulty;
 import it.einjojo.akani.boss.input.BossCreator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BoundingBox;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Command(name = "boss")
@@ -47,7 +56,34 @@ public class BossCommand {
             return;
         }
         executor.sendMessage(boss.debugInfoComponent());
+    }
 
+    @Execute(name = "reload")
+    public void reload(@Context CommandSender executor, @Arg("boss") Optional<String> optionalBossId) {
+        optionalBossId.ifPresentOrElse((bossId) -> {
+            akaniBoss.bossManager().load(bossId);
+            executor.sendMessage(miniMessage.deserialize("<green>Der Boss wurde neu geladen!"));
+        }, () -> {
+            akaniBoss.bossManager().loadAll();
+            executor.sendMessage(miniMessage.deserialize("<green>Alle Bosse wurden neu geladen!"));
+        });
+
+    }
+
+    @Execute(name = "test")
+    public void test(@Context CommandSender executor) {
+        Boss boss = new BossBuilder()
+                .id("test")
+                .name("Test Boss")
+                .difficulty(BossDifficulty.NORMAL)
+                .level(1)
+                .keyItem(new ItemStack(Material.DIAMOND))
+                .entranceBox(new BoundingBox(0f, 0f, 0f, 10f, 10f, 10f))
+                .keyRedeemLocation(new Location(Bukkit.getWorld("world"), 0, 0, 0))
+                .requirements(List.of())
+                .roomTemplateName("world")
+                .build();
+        akaniBoss.bossStorage().saveBoss(boss);
     }
 
 }

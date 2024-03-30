@@ -10,6 +10,7 @@ public class BossFight {
     private final Boss boss;
     private final Set<UUID> participants;
 
+
     public BossFight(Boss boss, Set<UUID> participants) {
         this.boss = boss;
         this.participants = participants;

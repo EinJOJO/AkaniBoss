@@ -1,12 +1,15 @@
 package it.einjojo.akani.boss.requirement.defaults;
 
 import it.einjojo.akani.boss.boss.Boss;
-import it.einjojo.akani.boss.requirement.KeyReedemRequirement;
-import it.einjojo.akani.boss.util.ParseUtil;
+import it.einjojo.akani.boss.requirement.Requirement;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
-public class MinimumPlayerKeyRedeemRequirement implements KeyReedemRequirement {
+/**
+ * Stupid requirement that checks if a certain amount of players are nearby.
+ *
+ */
+public class MinimumPlayerKeyRedeemRequirement implements Requirement {
     public static String NAME = "min_players";
     private final int minimumPlayers;
     private final double checkRadius;
@@ -20,8 +23,8 @@ public class MinimumPlayerKeyRedeemRequirement implements KeyReedemRequirement {
         if (args.length < 2) {
             return null;
         }
-        int minPlayers = ParseUtil.parseInt("min_players", args[1]);
-        double radius = args.length > 2 ? ParseUtil.parseDouble("radius", args[2]) : 10;
+        int minPlayers = Integer.parseInt(args[1]);
+        double radius = args.length > 2 ? Double.parseDouble(args[2]) : 10;
         return new MinimumPlayerKeyRedeemRequirement(minPlayers, radius);
     }
 
@@ -45,6 +48,11 @@ public class MinimumPlayerKeyRedeemRequirement implements KeyReedemRequirement {
 
     @Override
     public Component denyMessage(Player player) {
-        return Component.text("You need at least " + minimumPlayers + " players to redeem this key!");
+        return Component.text("Es müssen mindestens " + minimumPlayers + " in der Nähe sein!");
+    }
+
+    @Override
+    public CheckType checkType() {
+        return CheckType.KEY_REDEEM;
     }
 }

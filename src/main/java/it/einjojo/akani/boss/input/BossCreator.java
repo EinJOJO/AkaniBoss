@@ -1,10 +1,13 @@
 package it.einjojo.akani.boss.input;
 
 import it.einjojo.akani.boss.AkaniBoss;
+import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.boss.BossBuilder;
 import it.einjojo.akani.boss.boss.BossDifficulty;
 import it.einjojo.akani.boss.room.RoomTemplate;
-import it.einjojo.akani.boss.util.BoundaryBox;
+import it.einjojo.akani.boss.util.TextUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -14,6 +17,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.util.BoundingBox;
 
 public class BossCreator {
     private static final int MAX_STEPS = 9;
@@ -38,7 +42,11 @@ public class BossCreator {
             }
             player.sendMessage("");
             if (step == MAX_STEPS) {
-                akaniBoss.bossManager().registerBoss(bossBuilder.build());
+                Boss boss = bossBuilder.build();
+                akaniBoss.bossManager().registerBoss(boss);
+                akaniBoss.bossManager().saveBoss(boss).thenRun(() -> {
+                    player.sendActionBar(Component.text("Boss erfolgreich abgespeichert!").color(NamedTextColor.GRAY));
+                });
                 player.sendMessage("<green>Der Boss wurde erfolgreich erstellt!");
                 FireworkEffect effect = FireworkEffect.builder()
                         .with(FireworkEffect.Type.STAR)
@@ -95,7 +103,7 @@ public class BossCreator {
                     sendMessage(player, "Wähle eine <blue>Schwierigkeit <gray>aus:");
                     BossDifficulty[] difficulties = BossDifficulty.values();
                     for (int i = 0; i < difficulties.length; i++) {
-                        sendMessage(player, "<blue>" + (i + 1) + "<dark_gray>) <gray>" + difficulties[i].name());
+                        sendMessage(player, "<blue>" + (i + 1) + "<dark_gray>) <gray>" + TextUtil.transformLegacyToMiniMessage(difficulties[i].legacyText()));
                     }
                     new PlayerChatInput(player, ((input) -> {
                         try {
@@ -107,7 +115,7 @@ public class BossCreator {
                             }
                             BossDifficulty difficulty = difficulties[index];
                             bossBuilder.difficulty(difficulty);
-                            sendMessage(player, "<green><i>Schwierigkeit gesetzt: <reset>" + difficulty.name());
+                            sendMessage(player, "<green><i>Schwierigkeit gesetzt: <reset>" + TextUtil.transformLegacyToMiniMessage(difficulty.legacyText()));
                             step++;
                         } catch (NumberFormatException e) {
                             sendInputError(player, "Die Schwierigkeit muss eine Zahl sein!");
@@ -162,7 +170,7 @@ public class BossCreator {
                             askForInput();
                             return;
                         }
-                        bossBuilder.entranceBox(BoundaryBox.of(loc1, loc2));
+                        bossBuilder.entranceBox(BoundingBox.of(loc1, loc2));
                         sendMessage(player, "<green><i>Boundary-Box erstellt!");
                         step++;
                         askForInput();
@@ -191,7 +199,7 @@ public class BossCreator {
     }
 
     private String progress() {
-        return "<dark_gray>[<blue>" + (step + 1) + "</blue> <gray>/</gray> <white>" + (MAX_STEPS + 1) + "</white>] </dark_gray>";
+        return "<dark_gray>[<red>" + (step + 1) + "</red><gray>/</gray><red>" + (MAX_STEPS + 1) + "</red>] </dark_gray>";
     }
 
     public void onCancel() {

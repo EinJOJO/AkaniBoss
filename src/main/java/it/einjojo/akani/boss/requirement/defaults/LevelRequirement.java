@@ -1,12 +1,11 @@
 package it.einjojo.akani.boss.requirement.defaults;
 
 import it.einjojo.akani.boss.boss.Boss;
-import it.einjojo.akani.boss.requirement.EntranceRequirement;
-import it.einjojo.akani.boss.requirement.KeyReedemRequirement;
+import it.einjojo.akani.boss.requirement.Requirement;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
-public class LevelRequirement implements KeyReedemRequirement, EntranceRequirement {
+public class LevelRequirement implements Requirement {
     public static final String NAME = "min_level";
     private final int min_level;
 
@@ -31,7 +30,7 @@ public class LevelRequirement implements KeyReedemRequirement, EntranceRequireme
 
     @Override
     public Component denyMessage(Player player) {
-        return Component.text("You need to be at least level " + min_level + " to enter this boss room!");
+        return Component.text("Du musst mindestens Level " + min_level + " sein!");
     }
 
     @Override

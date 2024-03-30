@@ -12,14 +12,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class InputListener implements Listener {
-
     private static final Map<UUID, Input<?>> inputSessions = new HashMap<>();
+
+    public InputListener(JavaPlugin plugin) {
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
 
     public static void register(Input<?> input) {
         if (inputSessions.containsKey(input.playerUniqueId())) {
