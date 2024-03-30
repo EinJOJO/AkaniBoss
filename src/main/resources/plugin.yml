@@ -1,6 +1,7 @@
 name: AkaniBoss
 main: it.einjojo.akani.boss.AkaniBossPlugin
 version: 1.0
+api-version: 1.19
 author: einjojo
 website: einjojo.it
 softdepend:

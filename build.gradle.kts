@@ -38,12 +38,24 @@ repositories {
 dependencies {
     implementation(libs.guava)
     implementation(libs.gson)
+    implementation(libs.litecommands)
     compileOnly(libs.paper)
     compileOnly(libs.decentholograms)
 }
 
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+
+
+}
+
 tasks {
+    withType<JavaCompile>() {
+        options.encoding = "UTF-8"
+        options.compilerArgs.add("-parameters")
+    }
     build {
         dependsOn("shadowJar")
     }

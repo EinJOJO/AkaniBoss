@@ -23,8 +23,7 @@ public class BossBuilder {
     private List<KeyReedemRequirement> keyRedeemRequirements = List.of();
 
 
-    public BossBuilder() {
-    }
+    public BossBuilder() {}
 
     public BossBuilder(Boss boss) {
         this.id = boss.id();
