@@ -6,6 +6,7 @@ import it.einjojo.akani.boss.util.BoundaryBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -30,7 +31,8 @@ public record Boss(
         Location keyRedeemLocation,
         List<EntranceRequirement> entranceRequirements,
         List<KeyReedemRequirement> keyRedeemRequirements,
-        BoundaryBox entranceBox
+        BoundaryBox entranceBox,
+        ItemStack keyItem
 ) {
 
     public Component bossNameComponent() {
@@ -56,6 +58,10 @@ public record Boss(
         return Component.text().append(l1).append(l2).append(l3).append(l4).append(l5).append(l6)
                 .append(l7).append(l8).append(l9).build();
 
+    }
+
+    public boolean checkKey(ItemStack is) {
+        return keyItem.isSimilar(is);
     }
 
     public BossBuilder toBuilder() {

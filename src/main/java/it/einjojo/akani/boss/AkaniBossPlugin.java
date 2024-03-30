@@ -20,7 +20,7 @@ public class AkaniBossPlugin extends JavaPlugin {
                         new BossCommand(akaniBoss)
                 )
                 .build();
-        new InputListener();
+        getServer().getPluginManager().registerEvents(new InputListener(), this);
     }
 
     @Override

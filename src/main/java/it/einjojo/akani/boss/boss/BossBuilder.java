@@ -6,6 +6,7 @@ import it.einjojo.akani.boss.requirement.KeyReedemRequirement;
 import it.einjojo.akani.boss.requirement.RequirementFactory;
 import it.einjojo.akani.boss.util.BoundaryBox;
 import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -21,9 +22,11 @@ public class BossBuilder {
             RequirementFactory.keyUsedEntranceRequirement()
     );
     private List<KeyReedemRequirement> keyRedeemRequirements = List.of();
+    private ItemStack keyItem;
 
 
-    public BossBuilder() {}
+    public BossBuilder() {
+    }
 
     public BossBuilder(Boss boss) {
         this.id = boss.id();
@@ -82,6 +85,11 @@ public class BossBuilder {
         return this;
     }
 
+    public BossBuilder keyItem(ItemStack keyItem) {
+        this.keyItem = keyItem;
+        return this;
+    }
+
 
     public Boss build() {
         if (id == null) throw new IllegalStateException("id is null");
@@ -91,7 +99,8 @@ public class BossBuilder {
         if (entranceBox == null) throw new IllegalStateException("entranceBox is null");
         if (entranceRequirements == null) throw new IllegalStateException("entranceRequirements is null");
         if (keyRedeemRequirements == null) throw new IllegalStateException("keyReedem Requirements is null");
-        return new Boss(id, name, roomTemplateName, level, difficulty, keyRedeemLocation, entranceRequirements, keyRedeemRequirements, entranceBox);
+        if (keyItem == null) throw new IllegalStateException("keyItem is null");
+        return new Boss(id, name, roomTemplateName, level, difficulty, keyRedeemLocation, entranceRequirements, keyRedeemRequirements, entranceBox, keyItem);
     }
 
 }
