@@ -1,6 +1,7 @@
 package it.einjojo.akani.boss.storage.jsonfile.serializer;
 
 import com.google.gson.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.lang.reflect.Type;
@@ -22,7 +23,7 @@ public class JsonLocationAdapter implements Adapter<Location> {
     public Location deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject object = json.getAsJsonObject();
         return new Location(
-                context.deserialize(object.get("world"), String.class),
+                Bukkit.getWorld(object.get("world").getAsString()),
                 object.get("x").getAsDouble(),
                 object.get("y").getAsDouble(),
                 object.get("z").getAsDouble(),

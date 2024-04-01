@@ -21,7 +21,7 @@ public class AkaniBoss {
 
     public AkaniBoss(JavaPlugin plugin) {
         this.plugin = plugin;
-        this.bossFightManager = new BossFightManager();
+        this.bossFightManager = new BossFightManager(this);
         this.requirementFactory = new RequirementFactory(bossFightManager);
         gson = new GsonFactory(requirementFactory).createGson();
         bossStorage = new JsonFileBossStorage(gson, plugin.getDataFolder().toPath().resolve("boss/"));

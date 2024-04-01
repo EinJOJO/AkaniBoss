@@ -63,7 +63,7 @@ public class JsonBossAdapter implements Adapter<Boss> {
                 context.deserialize(object.get("key-location"), Location.class),
                 requirements,
                 context.deserialize(object.get("boundingBox"), BoundingBox.class),
-                context.deserialize(object.get("key-item"), ItemStack.class)
+                context.deserialize(object.get("item"), ItemStack.class)
         );
     }
 }

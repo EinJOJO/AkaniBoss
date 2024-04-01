@@ -26,7 +26,7 @@ public class GsonFactory {
                 .registerTypeAdapter(Boss.class, new JsonBossAdapter(requirementFactory))
                 .registerTypeAdapter(BoundingBox.class, new JsonBoundingBoxAdapter())
                 .registerTypeAdapter(Location.class, new JsonLocationAdapter())
-                .registerTypeAdapter(ItemStack.class, new JsonItemStackAdapter())
+                .registerTypeHierarchyAdapter(ItemStack.class, new JsonItemStackAdapter())
                 .create();
     }
 

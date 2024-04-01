@@ -47,7 +47,7 @@ public class BossCreator {
                 akaniBoss.bossManager().saveBoss(boss).thenRun(() -> {
                     player.sendActionBar(Component.text("Boss erfolgreich abgespeichert!").color(NamedTextColor.GRAY));
                 });
-                player.sendMessage("<green>Der Boss wurde erfolgreich erstellt!");
+                sendMessage(player, "<green>Der Boss wurde erfolgreich erstellt!");
                 FireworkEffect effect = FireworkEffect.builder()
                         .with(FireworkEffect.Type.STAR)
                         .withTrail()

@@ -11,6 +11,7 @@ public class HologramUtil {
     private static final String HOLOGRAM_PREFIX = "boss_";
 
     public static void removeBossHologram(Boss boss) {
+        if (DHAPI.getHologram(HOLOGRAM_PREFIX + boss.id()) == null) return;
         DHAPI.removeHologram(HOLOGRAM_PREFIX + boss.id());
     }
 
