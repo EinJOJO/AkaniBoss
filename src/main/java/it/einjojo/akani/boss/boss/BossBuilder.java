@@ -1,6 +1,7 @@
 package it.einjojo.akani.boss.boss;
 
 
+import it.einjojo.akani.boss.boss.mob.BossMob;
 import it.einjojo.akani.boss.requirement.Requirement;
 import it.einjojo.akani.boss.requirement.RequirementFactory;
 import org.bukkit.Location;
@@ -20,6 +21,7 @@ public class BossBuilder {
     private String roomTemplateName;
     private List<Requirement> requirements = new ArrayList<>(List.of(RequirementFactory.unlockedWithKeyRequirement()));
     private ItemStack keyItem;
+    private BossMob<?> bossMob;
 
 
     public BossBuilder() {
@@ -87,6 +89,10 @@ public class BossBuilder {
         return this;
     }
 
+    public BossBuilder bossMob(BossMob<?> bossMob) {
+        this.bossMob = bossMob;
+        return this;
+    }
 
     public Boss build() {
         if (id == null) throw new IllegalStateException("id is null");
@@ -96,7 +102,7 @@ public class BossBuilder {
         if (entranceBox == null) throw new IllegalStateException("dungeonEntrance is null");
         if (requirements == null) throw new IllegalStateException("requirements is null");
         if (keyItem == null) throw new IllegalStateException("keyItem is null");
-        return new Boss(id, name, roomTemplateName, level, difficulty, keyRedeemLocation, requirements, entranceBox, keyItem);
+        return new Boss(id, name, roomTemplateName, level, difficulty, keyRedeemLocation, requirements, entranceBox, keyItem, bossMob);
     }
 
 }

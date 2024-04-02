@@ -11,8 +11,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -41,10 +39,13 @@ public class BossFightEntranceCheckTask implements Runnable {
                     kickOut(boss, player, failed);
                     return;
                 }
-                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10, 20));
-                player.sendActionBar(Component.text("Du wirst in Kürze teleportiert!").color(NamedTextColor.GREEN));
+                participate(player, boss);
             }
         }
+    }
+
+    public void participate(Player player, Boss boss) {
+        akaniBoss.bossFightManager().participateInFight(player.getUniqueId(), boss);
     }
 
 

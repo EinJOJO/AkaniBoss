@@ -26,7 +26,6 @@ public class Base64ItemStack {
     }
 
     public static @Nullable ItemStack decode(@NotNull String base64) throws Base64ConvertException {
-        System.out.println("deserialize-base64: " + base64);
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decode(base64));
              BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream)) {
             return (ItemStack) dataInput.readObject();

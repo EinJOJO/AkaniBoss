@@ -10,15 +10,22 @@ import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public record Room(UUID roomID, RoomTemplate template) {
+/**
+ * Represents a room that is currently active in the game. This means that the room is created from a template and is currently used by a player.
+ *
+ * @param roomID   The unique ID of the room
+ * @param template The template of the room
+ */
+public record ActiveRoom(UUID roomID, RoomTemplate template) {
     public static String WORLD_NAME_PREFIX = "boss_";
 
     /**
      * @return Whether the room is currently used by a player
      */
+    @Deprecated(forRemoval = true)
     public boolean isEmpty() {
         return false;
-    }
+    } //TODO Remove this method
 
     public String worldName() {
         return WORLD_NAME_PREFIX + roomID.toString();
@@ -38,11 +45,9 @@ public record Room(UUID roomID, RoomTemplate template) {
             try {
                 Path destination = worldFolder();
                 Files.copy(template.worldTemplateFolder(), destination);
-                Files.delete(destination.resolve("uid.dat"));
-                Files.delete(destination.resolve("session.lock"));
                 plugin.getLogger().info("Template World copied to world folder");
-
             } catch (IOException e) {
+                e.printStackTrace();
                 future.completeExceptionally(e);
             }
             plugin.getServer().getScheduler().runTask(plugin, () -> {

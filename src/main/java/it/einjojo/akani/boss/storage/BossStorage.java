@@ -4,11 +4,15 @@ import it.einjojo.akani.boss.boss.Boss;
 
 import java.util.List;
 
+/**
+ * Interface for storing and loading bosses
+ */
 public interface BossStorage {
-    void saveBoss(Boss boss);
+    void saveBoss(Boss boss) throws StorageException;
 
-    Boss loadBoss(String id);
+    Boss loadBoss(String id) throws StorageException;
 
-    List<Boss> loadAllBosses();
+    List<Boss> loadAllBosses() throws StorageException;
+
 
 }

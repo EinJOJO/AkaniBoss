@@ -11,6 +11,7 @@ import it.einjojo.akani.boss.storage.jsonfile.JsonFileBossStorage;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AkaniBoss {
+    private static AkaniBoss instance;
     private final JavaPlugin plugin;
     private final Gson gson;
     private final BossStorage bossStorage;
@@ -20,6 +21,7 @@ public class AkaniBoss {
     private final RoomManager roomManager;
 
     public AkaniBoss(JavaPlugin plugin) {
+        instance = this;
         this.plugin = plugin;
         this.bossFightManager = new BossFightManager(this);
         this.requirementFactory = new RequirementFactory(bossFightManager);
@@ -27,6 +29,11 @@ public class AkaniBoss {
         bossStorage = new JsonFileBossStorage(gson, plugin.getDataFolder().toPath().resolve("boss/"));
         this.bossManager = new BossManager(bossStorage);
         this.roomManager = new RoomManager(plugin);
+    }
+
+    public static AkaniBoss get() {
+        if (instance == null) throw new IllegalStateException("AkaniBoss instance is not initialized.");
+        return instance;
     }
 
     public JavaPlugin plugin() {

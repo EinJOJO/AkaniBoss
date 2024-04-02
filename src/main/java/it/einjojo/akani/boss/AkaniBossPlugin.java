@@ -16,6 +16,9 @@ public class AkaniBossPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         akaniBoss = new AkaniBoss(this);
+        akaniBoss.roomManager().cleanupWorldContainer().thenRun(() -> {
+            getLogger().info("World container cleaned up async.");
+        });
         akaniBoss.roomManager().load();
         akaniBoss.bossManager().loadAll();
         new BossFightEntranceCheckTask(akaniBoss).start(this);

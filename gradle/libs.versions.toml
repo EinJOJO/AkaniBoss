@@ -9,6 +9,7 @@ vhusksync = "3.3.1"
 vcloudnet = "4.0.0-RC9"
 vluckperms = "5.4"
 vdecentholograms = "2.8.6"
+vmythicmobs = "5.6.1"
 
 
 # Libraries
@@ -45,7 +46,7 @@ cloudnetwrapperjvm = { group = "eu.cloudnetservice.cloudnet", name = "wrapper-jv
 luckperms = { group = "net.luckperms", name = "api", version.ref = "vluckperms" }
 boostedyaml = { group = "dev.dejvokep", name = "boosted-yaml", version.ref = "vboostedyaml" }
 decentholograms = { group = "com.github.decentsoftware-eu", name = "decentholograms", version.ref = "vdecentholograms" }
-
+mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version.ref = "vmythicmobs" }
 
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }

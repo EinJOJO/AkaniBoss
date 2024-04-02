@@ -3,64 +3,77 @@ package it.einjojo.akani.boss.storage.jsonfile;
 import com.google.gson.Gson;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.storage.BossStorage;
+import it.einjojo.akani.boss.storage.StorageException;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class JsonFileBossStorage implements BossStorage {
-    private final Gson gson;
-    private final Path bossFolder;
-
-    public JsonFileBossStorage(Gson gson, Path folder) {
-        this.gson = gson;
-        this.bossFolder = folder;
-    }
+/**
+ * A folder storage for bosses using json files
+ *
+ * @param gson       The gson instance
+ * @param bossFolder The folder to store the bosses
+ */
+public record JsonFileBossStorage(Gson gson, Path bossFolder) implements BossStorage {
 
     @Override
-    public void saveBoss(Boss boss) {
+    public void saveBoss(Boss boss) throws StorageException {
         try {
             Files.createDirectories(bossFolder);
             Path file = bossFolder.resolve(boss.id() + ".json");
-            try (FileWriter writer = new FileWriter(file.toFile())) {
+            try (Writer writer = Files.newBufferedWriter(file)) {
                 gson.toJson(boss, writer);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new StorageException(e);
         }
 
     }
 
 
     @Override
-    public Boss loadBoss(String id) {
+    public Boss loadBoss(String id) throws StorageException {
         return loadBossByPath(bossFolder.resolve(id + ".json"));
     }
 
-    public Boss loadBossByPath(Path path) {
+    public Boss loadBossByPath(Path path) throws StorageException {
         if (!Files.exists(path)) return null;
-        try {
-            return gson.fromJson(Files.newBufferedReader(path), Boss.class);
+        try (Reader reader = Files.newBufferedReader(path)) {
+            return gson.fromJson(reader, Boss.class);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new StorageException(e);
         }
     }
 
-    @Override
-    public List<Boss> loadAllBosses() {
-        try {
-            Files.createDirectories(bossFolder);
-            try (Stream<Path> stream = Files.list(bossFolder)) {
-                return stream.filter(path -> path.toString().endsWith(".json"))
-                        .map(this::loadBossByPath).filter(Objects::nonNull).collect(Collectors.toList());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+@Override
+public List<Boss> loadAllBosses() throws StorageException {
+    List<Boss> result = new ArrayList<>();
+    try {
+        Files.createDirectories(bossFolder);
+        try (Stream<Path> paths = Files.list(bossFolder)) {
+            paths.filter(path -> path.toString().endsWith(".json"))
+                .forEach(path -> {
+                    try {
+                        Boss boss = loadBossByPath(path);
+                        if (boss != null) {
+                            result.add(boss);
+                        }
+                    } catch (StorageException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
         }
+    } catch (IOException | RuntimeException e) {
+        throw new StorageException(e);
     }
+    return result;
+}
 }

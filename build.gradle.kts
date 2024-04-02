@@ -32,6 +32,7 @@ repositories {
         name = "packet-events"
         url = uri("https://repo.codemc.io/repository/maven-releases/")
     }
+    maven(url = "https://mvn.lumine.io/repository/maven-public/")
 
 }
 
@@ -41,6 +42,7 @@ dependencies {
     implementation(libs.litecommands)
     compileOnly(libs.paper)
     compileOnly(libs.decentholograms)
+    compileOnly(libs.mythicmobs)
 }
 
 

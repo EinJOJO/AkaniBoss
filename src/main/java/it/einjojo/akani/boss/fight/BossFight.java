@@ -3,7 +3,7 @@ package it.einjojo.akani.boss.fight;
 import com.google.common.collect.ImmutableSet;
 import it.einjojo.akani.boss.AkaniBoss;
 import it.einjojo.akani.boss.boss.Boss;
-import it.einjojo.akani.boss.room.Room;
+import it.einjojo.akani.boss.room.ActiveRoom;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -17,7 +17,7 @@ public class BossFight {
     private final Set<UUID> participants;
     private final Instant startedAt;
     private BossFightState state;
-    private Room fightRoom;
+    private ActiveRoom fightRoom;
 
 
     public BossFight(Boss boss, AkaniBoss internal) {
@@ -28,7 +28,7 @@ public class BossFight {
         startedAt = Instant.now();
     }
 
-    public void setRoom(Room room) {
+    public void setRoom(ActiveRoom room) {
         if (!state.equals(BossFightState.PREPARING)) {
             throw new IllegalStateException("Cannot set room when fight is not in preparing state");
         }
@@ -67,7 +67,7 @@ public class BossFight {
         return state;
     }
 
-    public Room fightRoom() {
+    public ActiveRoom fightRoom() {
         return fightRoom;
     }
 
