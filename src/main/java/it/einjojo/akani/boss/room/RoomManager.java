@@ -1,6 +1,6 @@
 package it.einjojo.akani.boss.room;
 
-import it.einjojo.akani.boss.AkaniBoss;
+import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.storage.jsonfile.JsonRoomDataFile;
 import it.einjojo.akani.boss.util.FileUtil;
 import org.bukkit.Bukkit;
@@ -19,12 +19,12 @@ import java.util.stream.Stream;
 
 public class RoomManager {
     private final JavaPlugin plugin;
-    private final AkaniBoss internal;
+    private final BossSystem internal;
     private final Path templatesFolder;
     private final List<ActiveRoom> loadedRooms = new LinkedList<>();
     private final Map<String, RoomTemplate> roomTemplates = new HashMap<>();
 
-    public RoomManager(JavaPlugin plugin, AkaniBoss internal) {
+    public RoomManager(JavaPlugin plugin, BossSystem internal) {
         this.plugin = plugin;
         templatesFolder = plugin.getDataFolder().toPath().resolve("templates");
         this.internal = internal;
@@ -70,26 +70,13 @@ public class RoomManager {
 
     /**
      * Creates or gets a room by the room template
-     *
      * @param roomTemplateName The name of the room template
      * @return A free room
      */
     public CompletableFuture<ActiveRoom> emptyRoom(String roomTemplateName) {
-        ActiveRoom emptyLoadedRoom = emptyLoadedRoomByTemplate(roomTemplateName);
-        if (emptyLoadedRoom != null) {
-            return CompletableFuture.completedFuture(emptyLoadedRoom);
-        }
         return createRoomByTemplate(roomTemplateName);
     }
 
-    public ActiveRoom emptyLoadedRoomByTemplate(String s) {
-        for (ActiveRoom room : loadedRooms) {
-            if (room.isEmpty() && room.template().templateName().equals(s)) {
-                return room;
-            }
-        }
-        return null;
-    }
 
     public CompletableFuture<ActiveRoom> createRoomByTemplate(String templateName) {
         RoomTemplate template = roomTemplates.get(templateName);
@@ -145,6 +132,7 @@ public class RoomManager {
                 });
             } catch (IOException e) {
                 plugin.getLogger().severe("Failed to cleanup world container: " + e.getMessage());
+                throw new RuntimeException(e);
             }
             if (unloadCheck.isEmpty()) {
                 return toDelete;
@@ -158,7 +146,12 @@ public class RoomManager {
                 unloadFuture.complete(toDelete);
             });
             return unloadFuture.join();
+        }).exceptionally((e) -> {
+            plugin.getLogger().severe("Failed to cleanup world container: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }).thenApplyAsync(toDelete -> {
+            if (toDelete == null) return null;
             toDelete.forEach(path -> {
                 try {
                     FileUtil.deleteFolder(path);

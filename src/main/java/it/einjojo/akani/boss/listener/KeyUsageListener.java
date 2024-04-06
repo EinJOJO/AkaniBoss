@@ -1,7 +1,8 @@
 package it.einjojo.akani.boss.listener;
 
-import it.einjojo.akani.boss.AkaniBoss;
+import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
+import it.einjojo.akani.boss.requirement.Requirement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
@@ -17,9 +18,9 @@ import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
 import static org.bukkit.event.Event.Result.DENY;
 
 public class KeyUsageListener implements Listener {
-    private final AkaniBoss bossInstance;
+    private final BossSystem bossInstance;
 
-    public KeyUsageListener(JavaPlugin plugin, AkaniBoss bossInstance) {
+    public KeyUsageListener(JavaPlugin plugin, BossSystem bossInstance) {
         this.bossInstance = bossInstance;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
@@ -36,24 +37,27 @@ public class KeyUsageListener implements Listener {
         event.setCancelled(true);
         event.setUseInteractedBlock(DENY);
         event.setUseItemInHand(DENY);
+        Requirement failed = boss.testKeyRedeemRequirements(event.getPlayer());
+        if (failed != null) {
+            failedRequirement(failed, event.getPlayer(), boss);
+            return;
+        }
         if (boss.checkKey(event.getItem())) {
-            bossInstance.bossFightManager().unsealBoss(boss, event.getPlayer().getUniqueId());
-            notifyBossKeyUsage(boss);
+            bossInstance.bossFightManager().permitPlayer(event.getPlayer().getUniqueId(), boss.id());
+            notifyBossKeyUsage(event.getPlayer(), boss);
         } else {
             event.getPlayer().sendActionBar(Component.text("Der Schlüssel passt nicht zu diesem Boss.").color(NamedTextColor.RED));
         }
 
     }
 
-    public void notifyBossKeyUsage(Boss boss) {
-        for (Player player : boss.keyRedeemLocation().getNearbyPlayers(15)) {
-            player.playSound(player.getLocation(), Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.2f);
-            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0.5f);
-            player.sendActionBar(
-                    Component.text("Das Siegel von ").color(GREEN)
-                            .append(boss.bossNameComponent())
-                            .append(Component.text(" wurde gelöst!").color(GREEN)));
+    public void failedRequirement(Requirement failedRequirement, Player player, Boss boss) {
+        player.sendActionBar(failedRequirement.denyMessage(player));
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+    }
 
-        }
+    public void notifyBossKeyUsage(Player player, Boss boss) {
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+        player.sendActionBar(Component.text("Der Schlüssel passt!").color(GREEN));
     }
 }

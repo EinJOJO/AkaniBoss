@@ -1,7 +1,7 @@
 package it.einjojo.akani.boss.fight;
 
 import com.google.common.collect.ImmutableSet;
-import it.einjojo.akani.boss.AkaniBoss;
+import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.room.ActiveRoom;
 
@@ -13,14 +13,14 @@ import java.util.UUID;
 public class BossFight {
 
     private final Boss boss;
-    private final AkaniBoss internal;
+    private final BossSystem internal;
     private final Set<UUID> participants;
     private final Instant startedAt;
     private BossFightState state;
     private ActiveRoom fightRoom;
 
 
-    public BossFight(Boss boss, AkaniBoss internal) {
+    public BossFight(Boss boss, BossSystem internal) {
         this.boss = boss;
         this.internal = internal;
         setState(BossFightState.PREPARING);
@@ -55,7 +55,7 @@ public class BossFight {
         return boss;
     }
 
-    public AkaniBoss internal() {
+    public BossSystem internal() {
         return internal;
     }
 

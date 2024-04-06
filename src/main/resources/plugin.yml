@@ -1,5 +1,5 @@
 name: AkaniBoss
-main: it.einjojo.akani.boss.AkaniBossPlugin
+main: it.einjojo.akani.boss.BossSystemPlugin
 version: 1.0
 api-version: 1.19
 author: einjojo

@@ -15,7 +15,26 @@ public class FileUtil {
                     .map(Path::toFile)
                     .forEach(File::delete);
         }
+    }
 
+    public static void copyRecursive(Path source, Path destination) throws IOException {
+        if (!Files.exists(source)) return;
+
+        Stream<Path> walk = Files.walk(source);
+
+        walk.forEach(path -> {
+            try {
+                Path target = destination.resolve(source.relativize(path));
+                if (Files.isDirectory(path)) {
+                    Files.createDirectories(target);
+                } else {
+                    Files.copy(path, target);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        walk.close();
     }
 
 }

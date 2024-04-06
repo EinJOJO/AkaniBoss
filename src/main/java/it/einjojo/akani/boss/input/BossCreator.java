@@ -1,6 +1,6 @@
 package it.einjojo.akani.boss.input;
 
-import it.einjojo.akani.boss.AkaniBoss;
+import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.boss.BossBuilder;
 import it.einjojo.akani.boss.boss.BossDifficulty;
@@ -22,7 +22,7 @@ import org.bukkit.util.BoundingBox;
 public class BossCreator {
     private static final int MAX_STEPS = 9;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
-    private final AkaniBoss akaniBoss;
+    private final BossSystem bossSystem;
     private final BossBuilder bossBuilder = new BossBuilder();
     private Player player;
     private int step = 0;
@@ -30,21 +30,21 @@ public class BossCreator {
     private Location loc1;
     private Location loc2;
 
-    public BossCreator(AkaniBoss akaniBossInstance, Player player) {
-        this.akaniBoss = akaniBossInstance;
+    public BossCreator(BossSystem bossSystemInstance, Player player) {
+        this.bossSystem = bossSystemInstance;
         this.player = player;
     }
 
     public void askForInput() {
-        Bukkit.getScheduler().runTask(akaniBoss.plugin(), () -> { // Wrapping it in a bukkit task, so it does not build up on the previous methods.
+        Bukkit.getScheduler().runTask(bossSystem.plugin(), () -> { // Wrapping it in a bukkit task, so it does not build up on the previous methods.
             if (step == -1) {
                 return;
             }
             player.sendMessage("");
             if (step == MAX_STEPS) {
                 Boss boss = bossBuilder.build();
-                akaniBoss.bossManager().registerBoss(boss);
-                akaniBoss.bossManager().saveBoss(boss).thenRun(() -> {
+                bossSystem.bossManager().registerBoss(boss);
+                bossSystem.bossManager().saveBoss(boss).thenRun(() -> {
                     player.sendActionBar(Component.text("Boss erfolgreich abgespeichert!").color(NamedTextColor.GRAY));
                 });
                 sendMessage(player, "<green>Der Boss wurde erfolgreich erstellt!");
@@ -139,10 +139,10 @@ public class BossCreator {
                     sendMessage(player, "<i><gold>Gib den Namen des Welt-Ordners an.");
                     sendMessage(player, "<i><gold>(Der befindet sich unter: plugins/AkaniBoss/templates/).");
                     new PlayerChatInput(player, ((template) -> {
-                        RoomTemplate roomTemplate = akaniBoss.roomManager().roomTemplate(template);
+                        RoomTemplate roomTemplate = bossSystem.roomManager().roomTemplate(template);
                         if (roomTemplate == null) {
                             sendInputError(player, "Die Template-Welt existiert nicht!");
-                            sendMessage(player, "Vorhandene Templates: <blue>" + akaniBoss.roomManager().roomTemplates().keySet());
+                            sendMessage(player, "Vorhandene Templates: <blue>" + bossSystem.roomManager().roomTemplates().keySet());
                             askForInput();
                             return;
                         }

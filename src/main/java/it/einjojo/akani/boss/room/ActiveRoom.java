@@ -21,6 +21,7 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
 
     /**
      * @return Whether the room is currently used by a player
+     * @deprecated This method is not used and will be removed in the future
      */
     @Deprecated(forRemoval = true)
     public boolean isEmpty() {
@@ -44,7 +45,7 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 Path destination = worldFolder();
-                Files.copy(template.worldTemplateFolder(), destination);
+                FileUtil.copyRecursive(template.worldTemplateFolder(), destination);
                 plugin.getLogger().info("Template World copied to world folder");
             } catch (IOException e) {
                 e.printStackTrace();

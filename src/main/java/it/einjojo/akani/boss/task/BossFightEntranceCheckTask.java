@@ -1,6 +1,6 @@
 package it.einjojo.akani.boss.task;
 
-import it.einjojo.akani.boss.AkaniBoss;
+import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.requirement.Requirement;
 import net.kyori.adventure.text.Component;
@@ -17,10 +17,10 @@ import java.util.Collection;
 
 public class BossFightEntranceCheckTask implements Runnable {
 
-    private final AkaniBoss akaniBoss;
+    private final BossSystem bossSystem;
 
-    public BossFightEntranceCheckTask(AkaniBoss akaniBoss) {
-        this.akaniBoss = akaniBoss;
+    public BossFightEntranceCheckTask(BossSystem bossSystem) {
+        this.bossSystem = bossSystem;
     }
 
     public void start(JavaPlugin plugin) {
@@ -29,12 +29,12 @@ public class BossFightEntranceCheckTask implements Runnable {
 
     @Override
     public void run() {
-        Collection<Boss> bossAltars = akaniBoss.bossManager().bosses().values();
+        Collection<Boss> bossAltars = bossSystem.bossManager().bosses().values();
         for (Boss boss : bossAltars) {
             if (!boss.keyRedeemLocation().getChunk().isLoaded()) return;
             for (Entity inBoundary : boss.keyRedeemLocation().getWorld().getNearbyEntities(boss.dungeonEntrance())) {
                 if (!(inBoundary instanceof Player player)) continue;
-                Requirement failed = boss.testRequirements(player);
+                Requirement failed = boss.testEntranceRequirements(player);
                 if (failed != null) {
                     kickOut(boss, player, failed);
                     return;
@@ -45,7 +45,7 @@ public class BossFightEntranceCheckTask implements Runnable {
     }
 
     public void participate(Player player, Boss boss) {
-        akaniBoss.bossFightManager().participateInFight(player.getUniqueId(), boss);
+        player.showTitle(Title.title(Component.text("Willkommen!").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD), Component.text("Du hast Zugang zum Bossraum!").color(NamedTextColor.GREEN)));
     }
 
 

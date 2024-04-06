@@ -2,6 +2,7 @@ package it.einjojo.akani.boss.boss;
 
 import com.google.common.collect.ImmutableMap;
 import it.einjojo.akani.boss.storage.BossStorage;
+import it.einjojo.akani.boss.storage.StorageException;
 import it.einjojo.akani.boss.util.HologramUtil;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +62,11 @@ public class BossManager {
     public CompletableFuture<Boolean> saveBoss(Boss boss) {
         return CompletableFuture.supplyAsync(() -> {
             logger.info("Saving boss " + boss.id());
-            storage.saveBoss(boss);
+            try {
+                storage.saveBoss(boss);
+            } catch (StorageException e) {
+                throw new RuntimeException(e);
+            }
             return true;
         }).exceptionally(throwable -> {
             logger.severe("Failed to save boss " + boss.id());
@@ -75,7 +80,13 @@ public class BossManager {
         if (existing != null) {
             unregisterBoss(existing);
         }
-        return CompletableFuture.supplyAsync(() -> storage.loadBoss(id)).thenApply(boss -> {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return storage.loadBoss(id);
+            } catch (StorageException e) {
+                throw new RuntimeException(e);
+            }
+        }).thenApply(boss -> {
             if (boss != null) {
                 registerBoss(boss);
             }
@@ -92,7 +103,13 @@ public class BossManager {
         for (Boss boss : bosses.values()) {
             unregisterBoss(boss);
         }
-        return CompletableFuture.supplyAsync(storage::loadAllBosses).thenApply((list) -> {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return storage.loadAllBosses();
+            } catch (StorageException e) {
+                throw new RuntimeException(e);
+            }
+        }).thenApply((list) -> {
             list.forEach(this::registerBoss);
             logger.info("Loaded " + list.size() + " bosses");
             return true;

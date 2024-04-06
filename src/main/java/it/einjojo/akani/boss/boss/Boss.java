@@ -61,8 +61,23 @@ public record Boss(
                 .append(l7).append(l8).build();
     }
 
-    public Requirement testRequirements(Player player) {
+    public Requirement testEntranceRequirements(Player player) {
         for (Requirement requirement : requirements) {
+            if (requirement.checkType().equals(Requirement.CheckType.KEY_REDEEM)) {
+                continue;
+            }
+            if (!requirement.check(this, player)) {
+                return requirement;
+            }
+        }
+        return null;
+    }
+
+    public Requirement testKeyRedeemRequirements(Player player) {
+        for (Requirement requirement : requirements) {
+            if ((requirement.checkType().equals(Requirement.CheckType.ENTER_ROOM))) {
+                continue;
+            }
             if (!requirement.check(this, player)) {
                 return requirement;
             }

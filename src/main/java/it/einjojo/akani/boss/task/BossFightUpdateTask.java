@@ -1,14 +1,14 @@
 package it.einjojo.akani.boss.task;
 
-import it.einjojo.akani.boss.AkaniBoss;
+import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.fight.BossFight;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class BossFightUpdateTask implements Runnable {
 
-    private final AkaniBoss boss;
+    private final BossSystem boss;
 
-    public BossFightUpdateTask(AkaniBoss boss) {
+    public BossFightUpdateTask(BossSystem boss) {
         this.boss = boss;
     }
 
