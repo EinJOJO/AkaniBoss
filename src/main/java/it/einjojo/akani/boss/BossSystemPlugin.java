@@ -4,6 +4,7 @@ import dev.rollczi.litecommands.LiteCommands;
 import dev.rollczi.litecommands.bukkit.LiteCommandsBukkit;
 import it.einjojo.akani.boss.command.BossCommand;
 import it.einjojo.akani.boss.command.RoomCommand;
+import it.einjojo.akani.boss.listener.FightListener;
 import it.einjojo.akani.boss.listener.InputListener;
 import it.einjojo.akani.boss.listener.KeyUsageListener;
 import it.einjojo.akani.boss.task.AsyncBossFightTickTask;
@@ -27,6 +28,7 @@ public class BossSystemPlugin extends JavaPlugin {
         new AsyncBossFightTickTask(bossSystem.bossFightManager(), this);
         new InputListener(this);
         new KeyUsageListener(this, bossSystem);
+        new FightListener(bossSystem.bossFightManager(), this);
         registerCommands();
     }
 

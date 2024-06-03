@@ -39,7 +39,7 @@ public class RoomCommand {
             return;
         }
         new RoomCreator(roomManager, plugin, player, roomTemplate, () -> {
-
+            player.sendMessage("Room created");
         }).startSetup();
 
     }

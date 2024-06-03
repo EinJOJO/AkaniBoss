@@ -23,7 +23,7 @@ public record RoomData(Location playerSpawnLocation, Location bossSpawnLocation)
         }
 
         public Builder bossSpawnLocation(Location bossSpawnLocation) {
-            playerSpawnLocation.setWorld(null);
+            bossSpawnLocation.setWorld(null);
             this.bossSpawnLocation = bossSpawnLocation;
             return this;
         }

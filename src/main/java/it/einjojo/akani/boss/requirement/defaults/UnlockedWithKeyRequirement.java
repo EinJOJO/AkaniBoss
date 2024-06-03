@@ -4,6 +4,7 @@ import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.fight.BossFightManager;
 import it.einjojo.akani.boss.requirement.Requirement;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 public class UnlockedWithKeyRequirement implements Requirement {
@@ -17,12 +18,12 @@ public class UnlockedWithKeyRequirement implements Requirement {
 
     @Override
     public boolean check(Boss boss, Player player) {
-        return bossFightManager.isAllowedToEnter(player.getUniqueId(), boss);
+        return bossFightManager.isAllowedToEnter(player.getUniqueId(), boss) || bossFightManager.playerBossFight(player.getUniqueId()) != null;
     }
 
     @Override
     public Component denyMessage(Player player) {
-        return Component.text("Das Siegel muss mit einem Schlüssel geöffnet werden!");
+        return Component.text("Das Siegel muss mit einem Schlüssel geöffnet werden!", NamedTextColor.RED);
     }
 
     @Override

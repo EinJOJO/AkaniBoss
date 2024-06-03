@@ -18,7 +18,7 @@ public enum BossFightState {
      */
     FIGHTING,
     /**
-     * After the boss is defeated
+     * After the boss is defeated or player dies
      */
     ENDING;
 

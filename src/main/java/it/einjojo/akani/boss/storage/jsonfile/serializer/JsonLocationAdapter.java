@@ -11,7 +11,7 @@ public class JsonLocationAdapter implements Adapter<Location> {
     @Override
     public JsonElement serialize(Location src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject object = new JsonObject();
-        object.addProperty("world", src.getWorld().getName());
+        if (src.getWorld() != null) object.addProperty("world", src.getWorld().getName());
         object.addProperty("x", src.getX());
         object.addProperty("y", src.getY());
         object.addProperty("z", src.getZ());

@@ -7,4 +7,6 @@ public interface StateLogic {
 
     void onParticipantJoin(Player player);
 
+
+
 }

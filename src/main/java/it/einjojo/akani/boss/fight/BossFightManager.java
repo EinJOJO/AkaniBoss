@@ -3,6 +3,9 @@ package it.einjojo.akani.boss.fight;
 import com.google.common.collect.ImmutableList;
 import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
+import it.einjojo.akani.boss.fight.state.StateLogicFactory;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.LinkedList;
@@ -21,6 +24,7 @@ public class BossFightManager {
 
     public BossFightManager(BossSystem bossSystem) {
         this.bossSystem = bossSystem;
+
     }
 
     public void allowEntrance(UUID uuid, Boss boss) {
@@ -39,7 +43,11 @@ public class BossFightManager {
     }
 
 
-    protected void setPlayerBossFight(UUID uuid, BossFight fight) {
+    protected void setPlayerBossFight(UUID uuid, @Nullable BossFight fight) {
+        if (fight == null) {
+            playerBossFights.remove(uuid);
+            return;
+        }
         if (playerBossFights.containsKey(uuid)) {
             throw new IllegalStateException("Player already has a boss fight");
         }
@@ -52,9 +60,18 @@ public class BossFightManager {
 
 
     public BossFight startNewBossFight(Boss target) {
-        BossFight fight = new BossFight(this, target);
+        BossFight fight = new BossFight(this, new StateLogicFactory(bossSystem.roomManager()), target);
         activeBossFights.add(fight);
         return fight;
+    }
+
+    public void closeBossFight(BossFight fight) {
+        fight.setState(BossFightState.ENDING);
+        for (Player player : fight.participantsPlayers()) {
+            player.teleport(fight.boss().keyRedeemLocation());
+        }
+        activeBossFights.remove(fight);
+        bossSystem.roomManager().deleteActiveRoom(fight.fightRoom());
     }
 
 

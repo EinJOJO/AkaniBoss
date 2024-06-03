@@ -43,7 +43,7 @@ public class KeyUsageListener implements Listener {
             return;
         }
         if (boss.checkKey(event.getItem())) {
-            bossInstance.bossFightManager().permitPlayer(event.getPlayer().getUniqueId(), boss.id());
+            bossInstance.bossFightManager().allowEntrance(event.getPlayer().getUniqueId(), boss);
             notifyBossKeyUsage(event.getPlayer(), boss);
         } else {
             event.getPlayer().sendActionBar(Component.text("Der Schlüssel passt nicht zu diesem Boss.").color(NamedTextColor.RED));

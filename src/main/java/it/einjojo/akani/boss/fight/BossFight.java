@@ -18,6 +18,8 @@ public class BossFight {
     @NotNull
     private final BossFightManager bossFightManager;
     @NotNull
+    private final StateLogicFactory stateLogicFactory;
+    @NotNull
     private final Boss boss;
     @NotNull
     private final Set<UUID> participants = new HashSet<>();
@@ -31,13 +33,15 @@ public class BossFight {
     private ActiveRoom fightRoom;
 
 
-    public BossFight(@NotNull BossFightManager bossFightManager, @NotNull Boss boss) {
+    public BossFight(@NotNull BossFightManager bossFightManager, @NotNull StateLogicFactory stateLogicFactory, @NotNull Boss boss) {
         Preconditions.checkNotNull(bossFightManager);
+        Preconditions.checkNotNull(stateLogicFactory);
         Preconditions.checkNotNull(boss);
         this.bossFightManager = bossFightManager;
+        this.stateLogicFactory = stateLogicFactory;
         this.boss = boss;
         state = BossFightState.PREPARING;
-        stateLogic = new StateLogicFactory().createLogic(this);
+        stateLogic = stateLogicFactory.createLogic(this);
     }
 
     /**
@@ -56,10 +60,18 @@ public class BossFight {
 
     public void addParticipant(Player player) {
         UUID uuid = player.getUniqueId();
-        bossFightManager.setPlayerBossFight(uuid, this);
-        participants.add(uuid);
-        stateLogic.onParticipantJoin(player);
+        try {
+            bossFightManager.setPlayerBossFight(uuid, this);
+            participants.add(uuid);
+            stateLogic.onParticipantJoin(player);
+        } catch (Exception ex) {
+            removeParticipant(uuid);
+        }
+    }
 
+    public void removeParticipant(UUID uuid) {
+        participants.remove(uuid);
+        bossFightManager.setPlayerBossFight(uuid, null);
     }
 
     public List<Player> participantsPlayers() {
@@ -75,9 +87,16 @@ public class BossFight {
 
     public void setState(BossFightState state) {
         this.state = state;
-        stateLogic = new StateLogicFactory().createLogic(this);
+        stateLogic = stateLogicFactory.createLogic(this);
     }
 
+    public boolean isParticipant(UUID uuid) {
+        return participants.contains(uuid);
+    }
+
+    public boolean isParticipant(Player player) {
+        return participants.contains(player.getUniqueId());
+    }
 
     public void tick() {
         stateLogic.tick();
@@ -103,4 +122,5 @@ public class BossFight {
     public Set<UUID> participants() {
         return ImmutableSet.copyOf(participants);
     }
+
 }

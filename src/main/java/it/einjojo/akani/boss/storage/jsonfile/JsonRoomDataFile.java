@@ -3,18 +3,18 @@ package it.einjojo.akani.boss.storage.jsonfile;
 import com.google.gson.Gson;
 import it.einjojo.akani.boss.room.RoomData;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public record JsonRoomDataFile(Gson gson, Path filePath) {
     public RoomData load() {
         if (!Files.exists(filePath)) return null;
-        try {
-            return gson.fromJson(new FileReader(filePath.toFile()), RoomData.class);
+        try (Reader reader = new FileReader(filePath.toFile())) {
+            return gson.fromJson(reader, RoomData.class);
         } catch (FileNotFoundException ignore) {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }
