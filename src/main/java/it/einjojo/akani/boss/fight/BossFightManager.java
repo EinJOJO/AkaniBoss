@@ -3,7 +3,7 @@ package it.einjojo.akani.boss.fight;
 import com.google.common.collect.ImmutableList;
 import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
-import it.einjojo.akani.boss.fight.state.StateLogicFactory;
+import it.einjojo.akani.boss.fight.state.defaults.StateLogicFactoryImpl;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,7 +60,7 @@ public class BossFightManager {
 
 
     public BossFight startNewBossFight(Boss target) {
-        BossFight fight = new BossFight(this, new StateLogicFactory(bossSystem.roomManager()), target);
+        BossFight fight = new BossFight(this, new StateLogicFactoryImpl(bossSystem.roomManager()), target);
         activeBossFights.add(fight);
         return fight;
     }
@@ -69,9 +69,12 @@ public class BossFightManager {
         fight.setState(BossFightState.ENDING);
         for (Player player : fight.participantsPlayers()) {
             player.teleport(fight.boss().keyRedeemLocation());
+            fight.removeParticipant(player.getUniqueId());
         }
         activeBossFights.remove(fight);
         bossSystem.roomManager().deleteActiveRoom(fight.fightRoom());
+
+
     }
 
 

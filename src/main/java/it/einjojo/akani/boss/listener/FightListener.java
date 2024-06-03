@@ -4,6 +4,8 @@ import it.einjojo.akani.boss.fight.BossFight;
 import it.einjojo.akani.boss.fight.BossFightManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,16 +34,16 @@ public class FightListener implements Listener {
     public void onLeave(PlayerQuitEvent event) {
         BossFight bossFight = bossFightManager.playerBossFight(event.getPlayer().getUniqueId());
         if (bossFight == null) return;
-        bossFight.removeParticipant(event.getPlayer().getUniqueId());
-        closeFightIfEmptyOrForEachParticipant(bossFight, (player) -> {
+        closeFightIfOnlyOneParticipantOrForEachParticipant(bossFight, (player) -> {
             player.sendMessage(miniMessage().deserialize("<red><player> <gray>hat den Bosskampf verlassen",
                     Placeholder.parsed("player", event.getPlayer().getName()))
             );
         });
+        bossFight.removeParticipant(event.getPlayer().getUniqueId());
     }
 
-    private void closeFightIfEmptyOrForEachParticipant(BossFight bossFight, Consumer<Player> playerConsumer) {
-        if (bossFight.participants().isEmpty()) {
+    private void closeFightIfOnlyOneParticipantOrForEachParticipant(BossFight bossFight, Consumer<Player> playerConsumer) {
+        if (bossFight.participants().size() <= 1) {
             bossFightManager.closeBossFight(bossFight);
             return;
         }
@@ -54,16 +56,22 @@ public class FightListener implements Listener {
     public void onDeath(PlayerDeathEvent event) {
         BossFight bossFight = bossFightManager.playerBossFight(event.getEntity().getUniqueId());
         if (bossFight == null) return;
-        bossFight.removeParticipant(event.getEntity().getUniqueId());
-        closeFightIfEmptyOrForEachParticipant(bossFight, (player) -> {
+        Player diedPlayer = event.getPlayer();
+        closeFightIfOnlyOneParticipantOrForEachParticipant(bossFight, (player) -> {
             player.sendMessage(miniMessage().deserialize("<red><player> ist gestorben!",
-                    Placeholder.parsed("player", event.getPlayer().getName()))
+                    Placeholder.parsed("player", diedPlayer.getName()))
             );
         });
-        event.getPlayer().sendMessage(miniMessage().deserialize("<red>Du bist gestorben!"));
+        diedPlayer.sendMessage(miniMessage().deserialize("<red>Du bist gestorben!"));
         event.deathMessage(null);
-        event.getPlayer().spigot().respawn();
-        event.getPlayer().teleportAsync(bossFight.boss().keyRedeemLocation());
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            diedPlayer.spigot().respawn();
+            Location loc = bossFight.boss().keyRedeemLocation().clone();
+            loc.setDirection(diedPlayer.getLocation().getDirection());
+            diedPlayer.teleportAsync(loc);
+        });
+
+
     }
 
     private MiniMessage miniMessage() {

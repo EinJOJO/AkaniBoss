@@ -1,8 +1,9 @@
-package it.einjojo.akani.boss.fight.state;
+package it.einjojo.akani.boss.fight.state.defaults;
 
 import it.einjojo.akani.boss.BossSystemPlugin;
 import it.einjojo.akani.boss.fight.BossFight;
 import it.einjojo.akani.boss.fight.BossFightState;
+import it.einjojo.akani.boss.fight.state.StateLogic;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -14,7 +15,7 @@ import java.time.Duration;
 import java.util.UUID;
 
 public class IntroductionStateLogic implements StateLogic {
-    private static final Duration INTRODUCTION_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration INTRODUCTION_TIMEOUT = Duration.ofSeconds(30);
     private final BossFight bossFight;
     private final long introductionEnd = System.currentTimeMillis() + INTRODUCTION_TIMEOUT.toMillis();
     private final Location spawnLocation;

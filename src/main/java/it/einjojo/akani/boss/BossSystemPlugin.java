@@ -3,6 +3,7 @@ package it.einjojo.akani.boss;
 import dev.rollczi.litecommands.LiteCommands;
 import dev.rollczi.litecommands.bukkit.LiteCommandsBukkit;
 import it.einjojo.akani.boss.command.BossCommand;
+import it.einjojo.akani.boss.command.FightCommand;
 import it.einjojo.akani.boss.command.RoomCommand;
 import it.einjojo.akani.boss.listener.FightListener;
 import it.einjojo.akani.boss.listener.InputListener;
@@ -36,7 +37,8 @@ public class BossSystemPlugin extends JavaPlugin {
         liteCommands = LiteCommandsBukkit.builder("bossrooms", this)
                 .commands(
                         new BossCommand(bossSystem),
-                        new RoomCommand(bossSystem, this)
+                        new RoomCommand(bossSystem, this),
+                        new FightCommand(bossSystem.bossFightManager())
                 )
                 .build();
     }

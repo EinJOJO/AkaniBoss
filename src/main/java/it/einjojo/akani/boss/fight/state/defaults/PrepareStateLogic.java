@@ -1,8 +1,9 @@
-package it.einjojo.akani.boss.fight.state;
+package it.einjojo.akani.boss.fight.state.defaults;
 
 import it.einjojo.akani.boss.BossSystemPlugin;
 import it.einjojo.akani.boss.fight.BossFight;
 import it.einjojo.akani.boss.fight.BossFightState;
+import it.einjojo.akani.boss.fight.state.StateLogic;
 import it.einjojo.akani.boss.room.ActiveRoom;
 import it.einjojo.akani.boss.room.RoomManager;
 import net.kyori.adventure.text.Component;
