@@ -9,8 +9,4 @@ public class EmptyStateLogic implements StateLogic {
 
     }
 
-    @Override
-    public void onParticipantJoin(Player player) {
-
-    }
 }

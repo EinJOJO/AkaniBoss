@@ -44,6 +44,7 @@ public record BossFightEntranceCheckTask(BossSystem bossSystem, JavaPlugin plugi
         if (existing != null) return;
         BossFight newBossFight = bossSystem.bossFightManager().startNewBossFight(boss);
         newBossFight.addParticipant(player);
+        bossSystem.bossFightManager().clearEntrance(player.getUniqueId(), boss);
     }
 
 

@@ -62,8 +62,5 @@ public class PrepareStateLogic implements StateLogic {
     }
 
 
-    @Override
-    public void onParticipantJoin(Player player) {
 
-    }
 }

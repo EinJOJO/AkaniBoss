@@ -81,9 +81,13 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
      * @throws IllegalStateException if players are in the world
      * @throws IOException           if the world cannot be deleted
      */
-    void deleteWorld() throws IOException {
-        if (world() == null) return;
-        Bukkit.unloadWorld(world(), false);
-        FileUtil.deleteFolder(worldFolder());
+    boolean deleteWorld() throws IOException {
+        if (world() == null) return false;
+        if (Bukkit.unloadWorld(world(), true)) {
+            FileUtil.deleteFolder(worldFolder());
+            return true;
+        }
+        ;
+        return false;
     }
 }

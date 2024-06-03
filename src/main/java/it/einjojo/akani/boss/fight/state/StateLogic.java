@@ -5,8 +5,6 @@ import org.bukkit.entity.Player;
 public interface StateLogic {
     void tick();
 
-    void onParticipantJoin(Player player);
-
 
 
 }

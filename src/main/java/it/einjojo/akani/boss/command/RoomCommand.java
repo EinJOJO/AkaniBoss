@@ -5,6 +5,7 @@ import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import it.einjojo.akani.boss.BossSystem;
+import it.einjojo.akani.boss.command.resolver.TemplateName;
 import it.einjojo.akani.boss.input.RoomCreator;
 import it.einjojo.akani.boss.room.RoomManager;
 import it.einjojo.akani.boss.room.RoomTemplate;
@@ -30,10 +31,10 @@ public class RoomCommand {
     }
 
     @Execute(name = "setup")
-    public void setup(@Context Player player, @Arg("templatename") String templateName) {
+    public void setup(@Context Player player, @Arg("templatename") TemplateName templateName) {
         player.sendMessage("Setup room with template " + templateName);
         RoomManager roomManager = system.roomManager();
-        RoomTemplate roomTemplate = roomManager.roomTemplate(templateName);
+        RoomTemplate roomTemplate = roomManager.roomTemplate(templateName.name());
         if (roomTemplate == null) {
             player.sendMessage("Room template not found");
             return;

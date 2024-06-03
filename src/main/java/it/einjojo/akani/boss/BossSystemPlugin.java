@@ -5,6 +5,8 @@ import dev.rollczi.litecommands.bukkit.LiteCommandsBukkit;
 import it.einjojo.akani.boss.command.BossCommand;
 import it.einjojo.akani.boss.command.FightCommand;
 import it.einjojo.akani.boss.command.RoomCommand;
+import it.einjojo.akani.boss.command.resolver.TemplateName;
+import it.einjojo.akani.boss.command.resolver.TemplateNameResolver;
 import it.einjojo.akani.boss.listener.FightListener;
 import it.einjojo.akani.boss.listener.InputListener;
 import it.einjojo.akani.boss.listener.KeyUsageListener;
@@ -40,6 +42,7 @@ public class BossSystemPlugin extends JavaPlugin {
                         new RoomCommand(bossSystem, this),
                         new FightCommand(bossSystem.bossFightManager())
                 )
+                .argument(TemplateName.class, new TemplateNameResolver(bossSystem.roomManager()))
                 .build();
     }
 

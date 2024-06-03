@@ -2,12 +2,15 @@ package it.einjojo.akani.boss.fight;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import it.einjojo.akani.boss.BossSystemPlugin;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.fight.state.StateLogic;
 import it.einjojo.akani.boss.fight.state.StateLogicFactory;
 import it.einjojo.akani.boss.room.ActiveRoom;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,7 +66,33 @@ public class BossFight {
         try {
             bossFightManager.setPlayerBossFight(uuid, this);
             participants.add(uuid);
-            stateLogic.onParticipantJoin(player);
+            Location spawnLocation = fightRoom().world().getSpawnLocation();
+            JavaPlugin plugin = JavaPlugin.getPlugin(BossSystemPlugin.class);
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (participants().isEmpty()) {
+                    player.teleportAsync(spawnLocation);
+                } else {
+                    UUID target = null;
+                    for (UUID puuid : participants()) {
+                        target = puuid;
+                        if (!target.equals(player.getUniqueId())) {
+                            break;
+                        }
+                    }
+                    if (target == null) {
+                        player.teleportAsync(spawnLocation);
+                        return;
+                    }
+
+                    Player targetPlayer = Bukkit.getPlayer(target);
+                    if (targetPlayer == null) {
+                        player.teleportAsync(spawnLocation);
+                        return;
+                    }
+                    ;
+                    player.teleportAsync(targetPlayer.getLocation());
+                }
+            });
         } catch (Exception ex) {
             removeParticipant(uuid);
         }

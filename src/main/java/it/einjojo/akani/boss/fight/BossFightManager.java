@@ -5,6 +5,7 @@ import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.fight.state.defaults.StateLogicFactoryImpl;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
@@ -14,6 +15,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Boss Fight Manager
+ * - Manages all active boss fights
+ * - Manages entrance permissions
+ * - Manages player -> boss fights
+ */
 public class BossFightManager {
     private static final Duration ENTRANCE_TIMEOUT = Duration.ofSeconds(30);
     private final BossSystem bossSystem;
@@ -24,7 +31,10 @@ public class BossFightManager {
 
     public BossFightManager(BossSystem bossSystem) {
         this.bossSystem = bossSystem;
+    }
 
+    public void clearEntrance(UUID uuid, Boss boss) {
+        entrancePermissionList.removeIf(permission -> permission.uuid().equals(uuid) && permission.boss().equals(boss));
     }
 
     public void allowEntrance(UUID uuid, Boss boss) {
@@ -65,6 +75,12 @@ public class BossFightManager {
         return fight;
     }
 
+    /**
+     * Deletes the boss fight and the room belonging to it.
+     *
+     * @param fight the fight
+     */
+    @Blocking
     public void closeBossFight(BossFight fight) {
         fight.setState(BossFightState.ENDING);
         for (Player player : fight.participantsPlayers()) {
@@ -72,9 +88,9 @@ public class BossFightManager {
             fight.removeParticipant(player.getUniqueId());
         }
         activeBossFights.remove(fight);
-        bossSystem.roomManager().deleteActiveRoom(fight.fightRoom());
+        if (bossSystem.roomManager().deleteActiveRoom(fight.fightRoom())) {
 
-
+        }
     }
 
 

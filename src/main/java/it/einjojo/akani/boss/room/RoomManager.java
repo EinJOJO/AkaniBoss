@@ -124,13 +124,17 @@ public class RoomManager {
         return loadedRooms;
     }
 
-    public void deleteActiveRoom(ActiveRoom activeRoom) {
-        loadedRooms.remove(activeRoom);
+    public boolean deleteActiveRoom(ActiveRoom activeRoom) {
+
         try {
-            activeRoom.deleteWorld();
-        } catch (IOException e) {
+            if (activeRoom.deleteWorld()) {
+                loadedRooms.remove(activeRoom);
+                return true;
+            }
+        } catch (Exception e) {
             logger().warning("Failed to delete world for room " + activeRoom.template().templateName() + ": " + e.getMessage());
         }
+        return false;
     }
 
 
