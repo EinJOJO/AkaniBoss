@@ -5,16 +5,22 @@ import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import it.einjojo.akani.boss.BossSystem;
+import it.einjojo.akani.boss.input.RoomCreator;
+import it.einjojo.akani.boss.room.RoomManager;
+import it.einjojo.akani.boss.room.RoomTemplate;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @Command(name = "bossroom")
 public class RoomCommand {
 
     private final BossSystem system;
+    private final JavaPlugin plugin;
 
-    public RoomCommand(BossSystem system) {
+    public RoomCommand(BossSystem system, JavaPlugin plugin) {
         this.system = system;
+        this.plugin = plugin;
     }
 
     @Execute(name = "info")
@@ -26,13 +32,15 @@ public class RoomCommand {
     @Execute(name = "setup")
     public void setup(@Context Player player, @Arg("templatename") String templateName) {
         player.sendMessage("Setup room with template " + templateName);
-        system.roomManager().createRoomByTemplate( templateName).thenAccept((room) -> {
-            player.teleportAsync(room.world().getSpawnLocation());
-            player.sendMessage("Room setup complete");
-        }).exceptionally(throwable -> {
-            player.sendMessage("Failed to setup room: " + throwable.getMessage());
-            return null;
-        });
+        RoomManager roomManager = system.roomManager();
+        RoomTemplate roomTemplate = roomManager.roomTemplate(templateName);
+        if (roomTemplate == null) {
+            player.sendMessage("Room template not found");
+            return;
+        }
+        new RoomCreator(roomManager, plugin, player, roomTemplate, () -> {
+
+        }).startSetup();
 
     }
 }

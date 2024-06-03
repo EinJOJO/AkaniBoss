@@ -5,7 +5,6 @@ import org.bukkit.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -48,8 +47,9 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
                 FileUtil.copyRecursive(template.worldTemplateFolder(), destination);
                 plugin.getLogger().info("Template World copied to world folder");
             } catch (IOException e) {
-                e.printStackTrace();
+                e.fillInStackTrace();
                 future.completeExceptionally(e);
+                return;
             }
             plugin.getServer().getScheduler().runTask(plugin, () -> {
                 World world = new WorldCreator(worldName()).generateStructures(false).type(WorldType.FLAT).createWorld();
@@ -81,7 +81,7 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
      * @throws IllegalStateException if players are in the world
      * @throws IOException           if the world cannot be deleted
      */
-    public void deleteWorld() throws IOException {
+    void deleteWorld() throws IOException {
         if (!world().getPlayers().isEmpty())
             throw new IllegalStateException("Cannot delete world while players are in it");
         Bukkit.unloadWorld(world(), false);

@@ -19,7 +19,7 @@ public record JsonRoomDataFile(Gson gson, Path filePath) {
         return null;
     }
 
-    void save(RoomData roomData) {
+    public void save(RoomData roomData) {
         try (Writer writer = Files.newBufferedWriter(filePath)) {
             gson.toJson(roomData, writer);
         } catch (Exception e) {

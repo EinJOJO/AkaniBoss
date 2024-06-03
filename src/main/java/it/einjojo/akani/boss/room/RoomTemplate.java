@@ -18,12 +18,6 @@ public record RoomTemplate(String templateName, Path worldTemplateFolder, RoomDa
         FileUtil.deleteFolder(worldTemplateFolder.resolve("playerdata"));
     }
 
-    /**
-     * @return a new RoomTemplate with the given RoomData
-     */
-    public RoomTemplate setRoomData(RoomData roomData) {
-        return new RoomTemplate(templateName, worldTemplateFolder, roomData);
-    }
 
     public Path roomDataPath() {
         return worldTemplateFolder.resolve("roomdata.json");

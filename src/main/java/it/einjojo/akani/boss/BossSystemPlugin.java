@@ -32,7 +32,7 @@ public class BossSystemPlugin extends JavaPlugin {
         liteCommands = LiteCommandsBukkit.builder("bossrooms", this)
                 .commands(
                         new BossCommand(bossSystem),
-                        new RoomCommand(bossSystem)
+                        new RoomCommand(bossSystem, this)
                 )
                 .build();
     }

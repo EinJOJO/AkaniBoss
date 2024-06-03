@@ -7,10 +7,9 @@ import org.bukkit.entity.Player;
 
 /**
  * Stupid requirement that checks if a certain amount of players are nearby.
- *
  */
 public class MinimumPlayerKeyRedeemRequirement implements Requirement {
-    public static String NAME = "min_players";
+    public static final String NAME = "min_players";
     private final int minimumPlayers;
     private final double checkRadius;
 
