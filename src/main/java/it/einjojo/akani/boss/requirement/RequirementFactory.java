@@ -27,13 +27,12 @@ public class RequirementFactory {
         if (args.length == 0) {
             return null;
         }
-        if (args[0].equals(LevelRequirement.NAME))
-            return LevelRequirement.ofArgs(args);
-        if (args[0].equals(MinimumPlayerKeyRedeemRequirement.NAME))
-            return MinimumPlayerKeyRedeemRequirement.ofArgs(args);
-        if (args[0].equals(UnlockedWithKeyRequirement.NAME))
-            return unlockedWithKeyRequirement();
-        return null;
+        return switch (args[0]) {
+            case LevelRequirement.NAME -> LevelRequirement.ofArgs(args);
+            case MinimumPlayerKeyRedeemRequirement.NAME -> MinimumPlayerKeyRedeemRequirement.ofArgs(args);
+            case UnlockedWithKeyRequirement.NAME -> unlockedWithKeyRequirement();
+            default -> null;
+        };
     }
 
 }

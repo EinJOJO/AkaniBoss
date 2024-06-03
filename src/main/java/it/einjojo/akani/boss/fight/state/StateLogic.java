@@ -1,8 +1,10 @@
 package it.einjojo.akani.boss.fight.state;
 
-import it.einjojo.akani.boss.fight.BossFight;
-import it.einjojo.akani.boss.fight.BossFightState;
+import org.bukkit.entity.Player;
 
 public interface StateLogic {
-    void update(BossFight currentFight);
+    void tick();
+
+    void onParticipantJoin(Player player);
+
 }

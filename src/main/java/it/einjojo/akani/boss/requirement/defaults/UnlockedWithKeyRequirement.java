@@ -17,7 +17,7 @@ public class UnlockedWithKeyRequirement implements Requirement {
 
     @Override
     public boolean check(Boss boss, Player player) {
-        return bossFightManager.canEnterBossRoom(player.getUniqueId(), boss.id());
+        return bossFightManager.isAllowedToEnter(player.getUniqueId(), boss);
     }
 
     @Override

@@ -6,6 +6,7 @@ import it.einjojo.akani.boss.command.BossCommand;
 import it.einjojo.akani.boss.command.RoomCommand;
 import it.einjojo.akani.boss.listener.InputListener;
 import it.einjojo.akani.boss.listener.KeyUsageListener;
+import it.einjojo.akani.boss.task.AsyncBossFightTickTask;
 import it.einjojo.akani.boss.task.BossFightEntranceCheckTask;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,7 +23,8 @@ public class BossSystemPlugin extends JavaPlugin {
         });
         bossSystem.roomManager().load();
         bossSystem.bossManager().loadAll();
-        new BossFightEntranceCheckTask(bossSystem).start(this);
+        new BossFightEntranceCheckTask(bossSystem, this);
+        new AsyncBossFightTickTask(bossSystem.bossFightManager(), this);
         new InputListener(this);
         new KeyUsageListener(this, bossSystem);
         registerCommands();

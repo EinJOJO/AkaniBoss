@@ -2,6 +2,7 @@ package it.einjojo.akani.boss.task;
 
 import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
+import it.einjojo.akani.boss.fight.BossFight;
 import it.einjojo.akani.boss.requirement.Requirement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,15 +16,9 @@ import org.bukkit.util.Vector;
 
 import java.util.Collection;
 
-public class BossFightEntranceCheckTask implements Runnable {
+public record BossFightEntranceCheckTask(BossSystem bossSystem, JavaPlugin plugin) implements Runnable {
 
-    private final BossSystem bossSystem;
-
-    public BossFightEntranceCheckTask(BossSystem bossSystem) {
-        this.bossSystem = bossSystem;
-    }
-
-    public void start(JavaPlugin plugin) {
+    public BossFightEntranceCheckTask {
         plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 0, 10);
     }
 
@@ -31,13 +26,13 @@ public class BossFightEntranceCheckTask implements Runnable {
     public void run() {
         Collection<Boss> bossAltars = bossSystem.bossManager().bosses().values();
         for (Boss boss : bossAltars) {
-            if (!boss.keyRedeemLocation().getChunk().isLoaded()) return;
+            if (!boss.keyRedeemLocation().getChunk().isLoaded()) continue;
             for (Entity inBoundary : boss.keyRedeemLocation().getWorld().getNearbyEntities(boss.dungeonEntrance())) {
                 if (!(inBoundary instanceof Player player)) continue;
                 Requirement failed = boss.testEntranceRequirements(player);
                 if (failed != null) {
                     kickOut(boss, player, failed);
-                    return;
+                    continue;
                 }
                 participate(player, boss);
             }
@@ -45,7 +40,10 @@ public class BossFightEntranceCheckTask implements Runnable {
     }
 
     public void participate(Player player, Boss boss) {
-        player.showTitle(Title.title(Component.text("Willkommen!").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD), Component.text("Du hast Zugang zum Bossraum!").color(NamedTextColor.GREEN)));
+        BossFight existing = bossSystem.bossFightManager().playerBossFight(player.getUniqueId());
+        if (existing != null) return;
+        BossFight newBossFight = bossSystem.bossFightManager().startNewBossFight(boss);
+        newBossFight.addParticipant(player);
     }
 
 
