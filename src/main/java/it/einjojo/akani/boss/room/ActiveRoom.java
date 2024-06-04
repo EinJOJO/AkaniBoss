@@ -81,7 +81,7 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
     }
 
     public boolean unloadWorld() {
-        return Bukkit.unloadWorld(world(), false);
+        return Bukkit.unloadWorld(world(), true);
     }
 
     /**

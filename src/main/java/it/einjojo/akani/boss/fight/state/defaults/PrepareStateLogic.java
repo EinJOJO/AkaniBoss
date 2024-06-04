@@ -49,9 +49,9 @@ public class PrepareStateLogic implements StateLogic {
         bossFight.setRoom(activeRoom);
         bossFight.setState(BossFightState.INTRODUCTION);
         JavaPlugin plugin = JavaPlugin.getPlugin(BossSystemPlugin.class);
-        Location location = activeRoom.template().roomData().playerSpawnLocation().clone();
-        location.setWorld(activeRoom.world());
+        Location location = activeRoom.playerSpawnLocation();
         activeRoom.world().setSpawnLocation(location);
+        activeRoom.world().getChunkAt(location);
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Player player : bossFight.participantsPlayers()) {
                 player.sendMessage(Component.text("Welt wurde erstellt", NamedTextColor.GRAY));
@@ -60,7 +60,6 @@ public class PrepareStateLogic implements StateLogic {
         });
 
     }
-
 
 
 }

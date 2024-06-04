@@ -6,6 +6,7 @@ import it.einjojo.akani.boss.BossSystemPlugin;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.fight.state.defaults.StateLogicFactoryImpl;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Blocking;
@@ -104,8 +105,9 @@ public class BossFightManager {
         Bukkit.getScheduler().runTask(BossSystemPlugin.instance(), () -> {
             fight.setState(BossFightState.CLOSED);
             World fightWorld = fight.fightRoom().world();
-            for (Player playerInWorld : fightWorld.getPlayers()) {
-                playerInWorld.teleport(fightWorld.getSpawnLocation());
+            Location location = fight.boss().keyRedeemLocation();
+            for (Player playerInWorld : fightWorld.getPlayers()) { // Regard Players that are spectating but not in fight
+                playerInWorld.teleportAsync(location);
             }
             for (Player player : fight.participantsPlayers()) {
                 fight.removeParticipant(player.getUniqueId());
@@ -114,8 +116,10 @@ public class BossFightManager {
                 bossMobRegistry.unregister(fight);
                 fight.boss().bossMob().despawn(mobUUID);
             }
-            bossSystem.roomManager().deleteActiveRoom(fight.fightRoom());
         });
+        Bukkit.getScheduler().runTaskLater(BossSystemPlugin.instance(), () -> {
+            bossSystem.roomManager().deleteActiveRoom(fight.fightRoom());
+        }, 20 * 10);
 
     }
 

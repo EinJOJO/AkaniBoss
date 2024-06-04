@@ -1,7 +1,6 @@
 package it.einjojo.akani.boss.fight.state.defaults;
 
 import it.einjojo.akani.boss.fight.BossFight;
-import it.einjojo.akani.boss.fight.BossFightState;
 import it.einjojo.akani.boss.fight.state.StateLogic;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -42,7 +41,7 @@ public class FatalExceptionStateLogic implements StateLogic {
     public void tick() {
         resetTimer--;
         if (resetTimer <= 0) {
-
+            bossFight.bossFightManager().closeBossFight(bossFight);
         }
     }
 

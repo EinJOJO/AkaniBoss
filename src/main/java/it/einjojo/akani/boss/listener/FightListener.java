@@ -128,8 +128,7 @@ public class FightListener implements Listener, BossFight.Listener {
         Bukkit.getScheduler().runTaskTimer(plugin, (task) -> {
             if (amount.decrementAndGet() == 0) {
                 task.cancel();
-            }
-            ;
+            };
             Location spawnLocation = center.clone();
             spawnLocation.add(random.nextInt(10) - 5, 0, random.nextInt(10) - 5);
             Firework firework = center.getWorld().spawn(spawnLocation, Firework.class);

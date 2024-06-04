@@ -13,8 +13,7 @@ import java.time.Duration;
 
 public class IntroductionStateLogic implements StateLogic {
     private static final Duration INTRODUCTION_TIMEOUT = Duration.ofSeconds(30);
-    private static final int DISTANCE_DIVIDER = 9;
-    private final double maxDistanceSquaredUntilToFarAwayForPlayerToJoin;
+    private static final double MAX_DISTANCE = 8 * 8;
     private final BossFight bossFight;
     private final long introductionEnd;
     private final Location spawnLocation;
@@ -22,7 +21,6 @@ public class IntroductionStateLogic implements StateLogic {
     public IntroductionStateLogic(BossFight bossFight) {
         this.bossFight = bossFight;
         this.spawnLocation = bossFight.fightRoom().playerSpawnLocation();
-        this.maxDistanceSquaredUntilToFarAwayForPlayerToJoin = spawnLocation.distanceSquared(bossFight.fightRoom().bossSpawnLocation()) / DISTANCE_DIVIDER;
         introductionEnd = System.currentTimeMillis() + INTRODUCTION_TIMEOUT.toMillis();
     }
 
@@ -46,7 +44,7 @@ public class IntroductionStateLogic implements StateLogic {
         for (Player player : bossFight.participantsPlayers()) {
             if (!player.getWorld().equals(spawnLocation.getWorld())) continue;
             double distancePlayerToSpawnSquared = player.getLocation().distanceSquared(spawnLocation);
-            if (distancePlayerToSpawnSquared > maxDistanceSquaredUntilToFarAwayForPlayerToJoin) {
+            if (distancePlayerToSpawnSquared > MAX_DISTANCE) {
                 return true;
             }
         }

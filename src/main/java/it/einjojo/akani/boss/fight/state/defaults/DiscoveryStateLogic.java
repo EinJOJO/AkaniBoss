@@ -43,8 +43,7 @@ public class DiscoveryStateLogic implements StateLogic {
                 BossBar.Color.PURPLE,
                 BossBar.Overlay.NOTCHED_6
         );
-        bossSpawnLocation = bossFight.fightRoom().template().roomData().bossSpawnLocation().clone();
-        bossSpawnLocation.setWorld(bossFight.fightRoom().world());
+        bossSpawnLocation = bossFight.fightRoom().bossSpawnLocation();
 
     }
 
@@ -63,6 +62,7 @@ public class DiscoveryStateLogic implements StateLogic {
             Player playerWhoLooksAtBoss = raytraceBoss(players);
             if (playerWhoLooksAtBoss != null) {
                 hasSeenBoss = true;
+                hideBossBar(players);
                 announceBossDiscovery(players, playerWhoLooksAtBoss);
             }
         } else {
