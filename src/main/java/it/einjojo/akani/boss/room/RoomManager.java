@@ -124,17 +124,23 @@ public class RoomManager {
         return loadedRooms;
     }
 
-    public boolean deleteActiveRoom(ActiveRoom activeRoom) {
-
-        try {
-            if (activeRoom.deleteWorld()) {
-                loadedRooms.remove(activeRoom);
-                return true;
+    /**
+     * Thread safe
+     *
+     * @param activeRoom
+     */
+    public void deleteActiveRoom(ActiveRoom activeRoom) {
+        CompletableFuture.runAsync(activeRoom::unloadWorld, Bukkit.getScheduler().getMainThreadExecutor(plugin)).thenRunAsync(() -> {
+            try {
+                activeRoom.deleteWorldFolder();
+            } catch (Exception ex) {
+                logger().warning("Failed to delete world for room " + activeRoom.template().templateName() + ": " + ex.getMessage());
             }
-        } catch (Exception e) {
-            logger().warning("Failed to delete world for room " + activeRoom.template().templateName() + ": " + e.getMessage());
-        }
-        return false;
+        }).exceptionally((ex) -> {
+            logger().warning("Failed to unload world for room " + activeRoom.template().templateName() + ": " + ex.getMessage());
+            return null;
+        });
+
     }
 
 

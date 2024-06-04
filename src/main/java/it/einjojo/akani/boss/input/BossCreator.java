@@ -22,7 +22,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.util.BoundingBox;
 
 public class BossCreator {
-    private static final int MAX_STEPS = 9;
+    private static final int MAX_STEPS = 10;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final BossSystem bossSystem;
     private final BossBuilder bossBuilder = new BossBuilder();
@@ -186,10 +186,16 @@ public class BossCreator {
                         try {
                             EntityType throwExceptionIfInvalid = EntityType.valueOf(input);
                             bossBuilder.bossMob(new VanillaMobFactory().createBossMob(input));
-                        } catch (IllegalArgumentException ignore) {
-                            bossBuilder.bossMob(new MythicBossMobFactory().createBossMob(input));
-                        } finally {
                             next();
+                            return;
+                        } catch (IllegalArgumentException ignore) {
+                        }
+                        try {
+                            bossBuilder.bossMob(new MythicBossMobFactory().createBossMob(input));
+                        } catch (IllegalArgumentException ignore) {
+                            sendInputError(player, "Dieses Mob existiert nicht!");
+                            askForInput();
+                            return;
                         }
                     }), this::onCancel);
 
@@ -205,7 +211,7 @@ public class BossCreator {
 
     private void next() {
         step++;
-        cleanup();
+        askForInput();
     }
 
     private void sendMessage(Player player, String message) {

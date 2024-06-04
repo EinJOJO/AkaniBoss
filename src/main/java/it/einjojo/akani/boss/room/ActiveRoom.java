@@ -18,21 +18,13 @@ import java.util.concurrent.CompletableFuture;
 public record ActiveRoom(UUID roomID, RoomTemplate template) {
     public static String WORLD_NAME_PREFIX = "boss_";
 
-    /**
-     * @return Whether the room is currently used by a player
-     * @deprecated This method is not used and will be removed in the future
-     */
-    @Deprecated(forRemoval = true)
-    public boolean isEmpty() {
-        return false;
-    } //TODO Remove this method
 
     public String worldName() {
         return WORLD_NAME_PREFIX + roomID.toString();
     }
 
     public Location playerSpawnLocation() {
-        Location l = template.roomData().bossSpawnLocation().clone();
+        Location l = template.roomData().playerSpawnLocation().clone();
         l.setWorld(world());
         return l;
     }
@@ -88,19 +80,20 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
         return future;
     }
 
+    public boolean unloadWorld() {
+        return Bukkit.unloadWorld(world(), false);
+    }
+
     /**
      * Unloads and deletes the world
      *
      * @throws IllegalStateException if players are in the world
      * @throws IOException           if the world cannot be deleted
      */
-    boolean deleteWorld() throws IOException {
-        if (world() == null) return false;
-        if (Bukkit.unloadWorld(world(), true)) {
-            FileUtil.deleteFolder(worldFolder());
-            return true;
+    public void deleteWorldFolder() throws IOException {
+        if (world() == null) {
+            return;
         }
-        ;
-        return false;
+        FileUtil.deleteFolder(worldFolder());
     }
 }

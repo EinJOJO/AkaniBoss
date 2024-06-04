@@ -14,7 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Instant;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -29,8 +29,8 @@ public class BossFight {
     @NotNull
     private final List<UUID> participants = new LinkedList<>();
     private final List<UUID> allParticipants = new LinkedList<>();
-    @NotNull
-    private final Instant startedAt = Instant.now();
+
+    private final long startedAt = System.currentTimeMillis();
     @Nullable
     private transient Listener changeListener;
     @NotNull
@@ -85,6 +85,7 @@ public class BossFight {
 
     /**
      * Participants that have participated. They might be dead already.
+     *
      * @return the participants
      */
     public List<UUID> allParticipants() {
@@ -122,10 +123,18 @@ public class BossFight {
         }
     }
 
+    public List<Player> allParticipantPlayers() {
+        return playersFromUUID(allParticipants);
+    }
+
     public List<Player> participantsPlayers() {
+        return playersFromUUID(participants);
+    }
+
+    private List<Player> playersFromUUID(Collection<UUID> uuids) {
         List<Player> players = new LinkedList<>();
-        for (UUID participantUUID : participants) {
-            Player player = Bukkit.getPlayer(participantUUID);
+        for (UUID uuid : uuids) {
+            Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 players.add(player);
             }
@@ -162,7 +171,7 @@ public class BossFight {
     }
 
 
-    public Instant startedAt() {
+    public long startedAt() {
         return startedAt;
     }
 
@@ -182,6 +191,16 @@ public class BossFight {
         this.changeListener = changeListener;
     }
 
+    @NotNull
+    public BossFightManager bossFightManager() {
+        return bossFightManager;
+    }
+
+    @NotNull
+    public StateLogic stateLogic() {
+        return stateLogic;
+    }
+
     @Nullable
     public Listener changeListener() {
         return changeListener;
@@ -195,8 +214,6 @@ public class BossFight {
         void onVictory(BossFight fight);
 
         void onDefeat(BossFight fight);
-
-
     }
 
 }

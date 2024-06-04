@@ -13,7 +13,8 @@ import java.time.Duration;
 
 public class IntroductionStateLogic implements StateLogic {
     private static final Duration INTRODUCTION_TIMEOUT = Duration.ofSeconds(30);
-    private final int maxDistanceSquaredUntilToFarAwayForPlayerToJoin;
+    private static final int DISTANCE_DIVIDER = 9;
+    private final double maxDistanceSquaredUntilToFarAwayForPlayerToJoin;
     private final BossFight bossFight;
     private final long introductionEnd;
     private final Location spawnLocation;
@@ -21,7 +22,7 @@ public class IntroductionStateLogic implements StateLogic {
     public IntroductionStateLogic(BossFight bossFight) {
         this.bossFight = bossFight;
         this.spawnLocation = bossFight.fightRoom().playerSpawnLocation();
-        this.maxDistanceSquaredUntilToFarAwayForPlayerToJoin = (int) spawnLocation.distanceSquared(bossFight.fightRoom().bossSpawnLocation()) / 3;
+        this.maxDistanceSquaredUntilToFarAwayForPlayerToJoin = spawnLocation.distanceSquared(bossFight.fightRoom().bossSpawnLocation()) / DISTANCE_DIVIDER;
         introductionEnd = System.currentTimeMillis() + INTRODUCTION_TIMEOUT.toMillis();
     }
 
@@ -43,7 +44,9 @@ public class IntroductionStateLogic implements StateLogic {
 
     private boolean anyParticipantToFarAwayFromEntrance() {
         for (Player player : bossFight.participantsPlayers()) {
-            if (player.getLocation().distanceSquared(spawnLocation) > maxDistanceSquaredUntilToFarAwayForPlayerToJoin) {
+            if (!player.getWorld().equals(spawnLocation.getWorld())) continue;
+            double distancePlayerToSpawnSquared = player.getLocation().distanceSquared(spawnLocation);
+            if (distancePlayerToSpawnSquared > maxDistanceSquaredUntilToFarAwayForPlayerToJoin) {
                 return true;
             }
         }

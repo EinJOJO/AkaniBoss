@@ -11,23 +11,28 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.RayTraceResult;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.UUID;
 
 public class DiscoveryStateLogic implements StateLogic {
 
-    private static final int SPAWN_DISTANCE_SQUARED = 42 * 42;
+    private static final int SPAWN_DISTANCE_SQUARED = 64 * 64;
     private static final Logger log = LoggerFactory.getLogger(DiscoveryStateLogic.class);
     private final BossMobRegistry bossMobRegistry;
     private final Location bossSpawnLocation;
     private final BossFight bossFight;
     private final BossBar findBossRoomBossBar;
+    private UUID bossUuid;
     private boolean wasNearBossSpawn;
+    private boolean hasSeenBoss;
 
     public DiscoveryStateLogic(BossMobRegistry bossMobRegistry, BossFight bossFight) {
         this.bossMobRegistry = bossMobRegistry;
@@ -50,14 +55,34 @@ public class DiscoveryStateLogic implements StateLogic {
             Player discoveryPlayer = findPlayerNearBossSpawn(players);
             if (discoveryPlayer != null) {
                 wasNearBossSpawn = true;
-                hideBossBar(players);
+                discoveryPlayer.playSound(discoveryPlayer, Sound.ENTITY_ENDER_DRAGON_GROWL, 0.3f, 0.2f);
                 spawnBoss();
-                announceBossDiscovery(players, discoveryPlayer);
+            }
+        } else if (!hasSeenBoss) {
+            List<Player> players = bossFight.participantsPlayers();
+            Player playerWhoLooksAtBoss = raytraceBoss(players);
+            if (playerWhoLooksAtBoss != null) {
+                hasSeenBoss = true;
+                announceBossDiscovery(players, playerWhoLooksAtBoss);
             }
         } else {
-            //TODO: Mehr.
             bossFight.setState(BossFightState.FIGHTING);
         }
+    }
+
+    private Player raytraceBoss(List<Player> players) {
+        for (Player player : players) {
+            if (player.getWorld().equals(bossSpawnLocation.getWorld())) {
+                RayTraceResult res = player.rayTraceEntities(40, false);
+                if (res == null) continue;
+                Entity entity = res.getHitEntity();
+                if (entity == null) continue;
+                if (bossUuid.equals(entity.getUniqueId())) {
+                    return player;
+                }
+            }
+        }
+        return null;
     }
 
     private void announceBossDiscovery(List<Player> players, Player discoveryPlayer) {
@@ -78,6 +103,10 @@ public class DiscoveryStateLogic implements StateLogic {
         }
     }
 
+    public BossBar findBossRoomBossBar() {
+        return findBossRoomBossBar;
+    }
+
     private Location bossSpawnLocation() {
         return bossSpawnLocation;
     }
@@ -85,12 +114,18 @@ public class DiscoveryStateLogic implements StateLogic {
     private void spawnBoss() {
         Bukkit.getScheduler().runTask(BossSystemPlugin.instance(), () -> {
             Object spawned = bossFight.boss().bossMob().spawn(bossSpawnLocation());
-            if (spawned instanceof Entity entity) {
-                bossMobRegistry.register(entity.getUniqueId(), bossFight);
-            } else if (spawned instanceof ActiveMob mythicMob) {
-                bossMobRegistry.register(mythicMob.getParentUUID().get(), bossFight);
-            } else {
-                log.warn("Spawned Boss could not be added to registry ");
+            try {
+                if (spawned instanceof Entity entity) {
+                    bossUuid = entity.getUniqueId();
+                } else if (spawned instanceof ActiveMob mythicMob) {
+                    bossUuid = mythicMob.getEntity().getUniqueId();
+                } else {
+                    log.warn("Spawned Boss could not be added to registry");
+                    bossFight.setState(BossFightState.FATAL_EXCEPTION);
+                    return;
+                }
+                bossMobRegistry.register(bossUuid, bossFight);
+            } catch (NoClassDefFoundError ignore) {
             }
         });
     }

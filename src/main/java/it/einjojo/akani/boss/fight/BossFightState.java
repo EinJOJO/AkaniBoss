@@ -22,11 +22,15 @@ public enum BossFightState {
      */
     VICTORY,
     /**
-     *
+     * Objective failed.
      */
     DEFEATED,
     /**
-     * After the boss is defeated or player dies
+     * A fatal exception occurred where the fight cannot continue.
+     */
+    FATAL_EXCEPTION,
+    /**
+     * After the boss is defeated or player dies. The fight is over. No more actions can be taken.
      */
     CLOSED;
 

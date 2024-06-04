@@ -2,8 +2,11 @@ package it.einjojo.akani.boss.fight;
 
 import com.google.common.collect.ImmutableList;
 import it.einjojo.akani.boss.BossSystem;
+import it.einjojo.akani.boss.BossSystemPlugin;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.fight.state.defaults.StateLogicFactoryImpl;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.Nullable;
@@ -98,18 +101,22 @@ public class BossFightManager {
      */
     @Blocking
     public void closeBossFight(BossFight fight) {
-        fight.setState(BossFightState.CLOSED);
-        for (Player player : fight.participantsPlayers()) {
-            player.teleport(fight.boss().keyRedeemLocation());
-            fight.removeParticipant(player.getUniqueId());
-        }
-        activeBossFights.remove(fight);
-        UUID mobUUID = bossMobRegistry.getByFight(fight);
-        bossMobRegistry.unregister(fight);
-        fight.boss().bossMob().despawn(mobUUID);
-        if (bossSystem.roomManager().deleteActiveRoom(fight.fightRoom())) {
+        Bukkit.getScheduler().runTask(BossSystemPlugin.instance(), () -> {
+            fight.setState(BossFightState.CLOSED);
+            World fightWorld = fight.fightRoom().world();
+            for (Player playerInWorld : fightWorld.getPlayers()) {
+                playerInWorld.teleport(fightWorld.getSpawnLocation());
+            }
+            for (Player player : fight.participantsPlayers()) {
+                fight.removeParticipant(player.getUniqueId());
+                activeBossFights.remove(fight);
+                UUID mobUUID = bossMobRegistry.getByFight(fight);
+                bossMobRegistry.unregister(fight);
+                fight.boss().bossMob().despawn(mobUUID);
+            }
+            bossSystem.roomManager().deleteActiveRoom(fight.fightRoom());
+        });
 
-        }
     }
 
 

@@ -3,19 +3,27 @@ package it.einjojo.akani.boss.listener;
 import it.einjojo.akani.boss.fight.BossFight;
 import it.einjojo.akani.boss.fight.BossFightManager;
 import it.einjojo.akani.boss.fight.BossFightState;
+import it.einjojo.akani.boss.fight.state.defaults.DiscoveryStateLogic;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.time.Duration;
+import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Event Based Logic for boss fights.
@@ -55,7 +63,16 @@ public class FightListener implements Listener, BossFight.Listener {
         if (bossFight == null) return;
         Player diedPlayer = event.getPlayer();
         bossFight.removeParticipant(diedPlayer.getUniqueId());
+        if (bossFight.stateLogic() instanceof DiscoveryStateLogic discoveryStateLogic) {
+            diedPlayer.hideBossBar(discoveryStateLogic.findBossRoomBossBar());
+        }
+        if (bossFight.participants().isEmpty()) {
+            bossFight.setState(BossFightState.DEFEATED);
+        }
         diedPlayer.sendMessage(miniMessage().deserialize("<red>Du bist gestorben!"));
+        bossFight.participantsPlayers().forEach(player -> player.sendMessage(miniMessage().deserialize("<red><player> ist gestorben!",
+                Placeholder.parsed("player", diedPlayer.getName()))
+        ));
         event.deathMessage(null);
         Bukkit.getScheduler().runTask(plugin, () -> {
             diedPlayer.spigot().respawn();
@@ -70,8 +87,8 @@ public class FightListener implements Listener, BossFight.Listener {
         BossFight fight = bossFightManager.bossMobRegistry().getByMobId(event.getEntity().getUniqueId());
         if (fight == null) return;
         fight.setState(BossFightState.VICTORY);
-
     }
+
 
     private MiniMessage miniMessage() {
         return MiniMessage.miniMessage();
@@ -79,21 +96,57 @@ public class FightListener implements Listener, BossFight.Listener {
 
     @Override
     public void onParticipantJoin(BossFight fight, Player player) {
+        fight.participantsPlayers().forEach(p -> p.sendMessage(miniMessage().deserialize("<green><player> ist dem Kampf beigetreten!",
+                Placeholder.parsed("player", player.getName()))
+        ));
 
     }
 
     @Override
     public void onParticipantLeave(BossFight fight, UUID uuid) {
-
+        fight.participantsPlayers().forEach(player -> player.sendMessage(miniMessage().deserialize("<red><player> hat den Kampf verlassen!",
+                Placeholder.parsed("player", Bukkit.getPlayer(uuid).getName()))
+        ));
     }
 
     @Override
     public void onVictory(BossFight fight) {
+        bossFightManager.closeBossFight(fight);
+        fight.allParticipantPlayers().forEach(player -> {
+            player.sendMessage(miniMessage().deserialize("<green>Der Boss wurde besiegt!"));
+            player.sendMessage(miniMessage().deserialize("<yellow>Zeit: <green><time> Sekunden",
+                    Placeholder.parsed("time", String.valueOf(Duration.ofMillis(System.currentTimeMillis() - fight.startedAt()).toSeconds()))
+            ));
+        });
+        spawnFireworks(fight.boss().keyRedeemLocation());
+    }
 
+
+    private void spawnFireworks(Location center) {
+        Random random = new Random();
+        AtomicInteger amount = new AtomicInteger(random.nextInt(6) + 3);
+        Bukkit.getScheduler().runTaskTimer(plugin, (task) -> {
+            if (amount.decrementAndGet() == 0) {
+                task.cancel();
+            }
+            ;
+            Location spawnLocation = center.clone();
+            spawnLocation.add(random.nextInt(10) - 5, 0, random.nextInt(10) - 5);
+            Firework firework = center.getWorld().spawn(spawnLocation, Firework.class);
+            FireworkMeta meta = firework.getFireworkMeta();
+            meta.setPower(random.nextInt(3) + 1);
+            meta.addEffect(FireworkEffect.builder()
+                    .withColor(Color.YELLOW)
+                    .with(FireworkEffect.Type.BALL_LARGE)
+                    .build());
+            firework.setFireworkMeta(meta);
+
+        }, 10, random.nextInt(25) + 10);
     }
 
     @Override
     public void onDefeat(BossFight fight) {
-
+        fight.participantsPlayers().forEach(player -> player.sendMessage(miniMessage().deserialize("<red>Der Boss hat gewonnen!")));
+        bossFightManager.closeBossFight(fight);
     }
 }
