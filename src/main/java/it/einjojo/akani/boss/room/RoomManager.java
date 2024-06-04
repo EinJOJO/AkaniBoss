@@ -25,6 +25,7 @@ public class RoomManager {
     private final BossSystem internal;
     private final Path templatesFolder;
     private final List<ActiveRoom> loadedRooms = new LinkedList<>();
+    private final List<String> toBeDeletedWorldName = new LinkedList<>();
     private final List<RoomTemplate> roomTemplatesRequiringSetup = new LinkedList<>();
     private final Map<String, RoomTemplate> roomTemplates = new ConcurrentHashMap<>();
 
@@ -34,6 +35,9 @@ public class RoomManager {
         this.internal = internal;
     }
 
+    public boolean isWorldNameToBeDeleted(String worldName) {
+        return toBeDeletedWorldName.contains(worldName);
+    }
 
     /**
      * Loads room templates from the specified folder. If the folder does not exist, it creates the folder.
@@ -62,11 +66,11 @@ public class RoomManager {
                 RoomData data = new JsonRoomDataFile(internal.gson(), path.resolve("roomdata.json")).load();
                 if (data == null) {
                     data = RoomData.PLACEHOLDER;
-                    logger().warning("Failed to load roomdata.json for template " + path.getFileName().toString());
                 }
                 RoomTemplate template = new RoomTemplate(path.getFileName().toString(), path, data);
                 if (data == RoomData.PLACEHOLDER) {
                     roomTemplatesRequiringSetup.add(template);
+                    logger().warning("Room template " + template.templateName() + " requires setup.");
                 }
                 template.cleanFolder();
                 roomTemplates.put(template.templateName(), template);
@@ -75,6 +79,10 @@ public class RoomManager {
         } catch (IOException e) {
             plugin.getLogger().warning("Failed to load room templates: " + e.getMessage());
         }
+    }
+
+    public List<RoomTemplate> roomTemplatesRequiringSetup() {
+        return roomTemplatesRequiringSetup;
     }
 
     protected Logger logger() {
@@ -130,16 +138,9 @@ public class RoomManager {
      * @param activeRoom
      */
     public void deleteActiveRoom(ActiveRoom activeRoom) {
-        CompletableFuture.runAsync(activeRoom::unloadWorld, Bukkit.getScheduler().getMainThreadExecutor(plugin)).thenRunAsync(() -> {
-            try {
-                activeRoom.deleteWorldFolder();
-            } catch (Exception ex) {
-                logger().warning("Failed to delete world for room " + activeRoom.template().templateName() + ": " + ex.getMessage());
-            }
-        }).exceptionally((ex) -> {
-            logger().warning("Failed to unload world for room " + activeRoom.template().templateName() + ": " + ex.getMessage());
-            return null;
-        });
+        toBeDeletedWorldName.remove(activeRoom.worldName());
+        activeRoom.unloadWorld();
+        loadedRooms.remove(activeRoom);
 
     }
 
@@ -154,20 +155,25 @@ public class RoomManager {
      * @return A CompletableFuture that completes when the cleanup is done
      */
     public CompletableFuture<Void> cleanupWorldContainer() {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             List<World> unloadCheck = new LinkedList<>();
-            List<Path> toDelete = new LinkedList<>();
             try (Stream<Path> stream = Files.walk(Bukkit.getWorldContainer().toPath())) {
                 stream.filter(path -> path.getFileName().toString().startsWith(ActiveRoom.WORLD_NAME_PREFIX)).forEach(worldPath -> {
-                    World world = Bukkit.getWorld(worldPath.getFileName().toString());
+                    String worldName = worldPath.getFileName().toString();
+                    World world = Bukkit.getWorld(worldName);
                     if (world == null) {
-                        toDelete.add(worldPath);
+                        try {
+                            FileUtil.deleteFolder(worldPath);
+                            log.info("Deleted world folder {}", worldPath);
+                        } catch (IOException ignore) {
+                        }
                         return;
                     }
                     // Only delete worlds that are not used by any player
                     if (world.getPlayerCount() == 0) {
-                        toDelete.add(worldPath);
+                        toBeDeletedWorldName.add(worldName);
                         unloadCheck.add(world);
+                        log.info("World {} is not used by any player, will be deleted", worldName);
                     }
                 });
             } catch (IOException e) {
@@ -175,30 +181,18 @@ public class RoomManager {
                 throw new RuntimeException(e);
             }
             if (unloadCheck.isEmpty()) {
-                return toDelete;
+                return;
             }
             // Sync unload worlds
-            CompletableFuture<List<Path>> unloadFuture = new CompletableFuture<>();
             plugin.getServer().getScheduler().runTask(plugin, () -> {
                 unloadCheck.forEach((world) -> {
                     Bukkit.unloadWorld(world, false);
                 });
-                unloadFuture.complete(toDelete);
             });
-            return unloadFuture.join();
+            return;
         }).exceptionally((e) -> {
             plugin.getLogger().severe("Failed to cleanup world container: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }).thenApplyAsync(toDelete -> {
-            if (toDelete == null) return null;
-            toDelete.forEach(path -> {
-                try {
-                    FileUtil.deleteFolder(path);
-                } catch (IOException e) {
-                    plugin.getLogger().severe("Failed to delete world folder " + path + ": " + e.getMessage());
-                }
-            });
+            e.fillInStackTrace();
             return null;
         });
     }

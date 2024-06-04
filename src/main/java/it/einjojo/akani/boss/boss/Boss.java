@@ -43,7 +43,6 @@ public record Boss(
 
     public Component debugInfoComponent() {
         NamedTextColor GRAY = NamedTextColor.GRAY;
-
         NamedTextColor PRIMARY = NamedTextColor.LIGHT_PURPLE;
         var l1 = Component.text("ID: ").color(GRAY).append(Component.text(id).color(PRIMARY)).appendNewline();
         var l2 = Component.text("Name: ").append(bossNameComponent()).appendNewline();

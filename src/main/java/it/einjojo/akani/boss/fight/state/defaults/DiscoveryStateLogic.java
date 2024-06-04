@@ -1,7 +1,6 @@
 package it.einjojo.akani.boss.fight.state.defaults;
 
 import io.lumine.mythic.core.mobs.ActiveMob;
-import it.einjojo.akani.boss.BossSystemPlugin;
 import it.einjojo.akani.boss.fight.BossFight;
 import it.einjojo.akani.boss.fight.BossFightState;
 import it.einjojo.akani.boss.fight.BossMobRegistry;
@@ -14,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class DiscoveryStateLogic implements StateLogic {
-
     private static final int SPAWN_DISTANCE_SQUARED = 64 * 64;
     private static final Logger log = LoggerFactory.getLogger(DiscoveryStateLogic.class);
+    private final JavaPlugin plugin;
     private final BossMobRegistry bossMobRegistry;
     private final Location bossSpawnLocation;
     private final BossFight bossFight;
@@ -34,7 +34,8 @@ public class DiscoveryStateLogic implements StateLogic {
     private boolean wasNearBossSpawn;
     private boolean hasSeenBoss;
 
-    public DiscoveryStateLogic(BossMobRegistry bossMobRegistry, BossFight bossFight) {
+    public DiscoveryStateLogic(JavaPlugin plugin, BossMobRegistry bossMobRegistry, BossFight bossFight) {
+        this.plugin = plugin;
         this.bossMobRegistry = bossMobRegistry;
         this.bossFight = bossFight;
         findBossRoomBossBar = BossBar.bossBar(
@@ -112,7 +113,7 @@ public class DiscoveryStateLogic implements StateLogic {
     }
 
     private void spawnBoss() {
-        Bukkit.getScheduler().runTask(BossSystemPlugin.instance(), () -> {
+        Bukkit.getScheduler().runTask(plugin, () -> {
             Object spawned = bossFight.boss().bossMob().spawn(bossSpawnLocation());
             try {
                 if (spawned instanceof Entity entity) {

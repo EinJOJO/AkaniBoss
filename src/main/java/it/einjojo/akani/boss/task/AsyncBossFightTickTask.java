@@ -8,8 +8,6 @@ public record AsyncBossFightTickTask(BossFightManager bossFightManager, JavaPlug
     public AsyncBossFightTickTask {
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this, 0, 5);
     }
-
-
     @Override
     public void run() {
         for (BossFight fight : bossFightManager.activeBossFights()) {

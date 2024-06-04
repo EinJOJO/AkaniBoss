@@ -56,6 +56,7 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
                 future.completeExceptionally(e);
                 return;
             }
+            // Work with the world on the main thread.
             plugin.getServer().getScheduler().runTask(plugin, () -> {
                 World world = new WorldCreator(worldName()).generateStructures(false).type(WorldType.FLAT).createWorld();
                 if (world == null) {
@@ -81,7 +82,7 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
     }
 
     public boolean unloadWorld() {
-        return Bukkit.unloadWorld(world(), true);
+        return Bukkit.unloadWorld(world(), false);
     }
 
     /**

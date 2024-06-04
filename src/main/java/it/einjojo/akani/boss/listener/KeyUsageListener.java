@@ -18,10 +18,10 @@ import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
 import static org.bukkit.event.Event.Result.DENY;
 
 public class KeyUsageListener implements Listener {
-    private final BossSystem bossInstance;
+    private final BossSystem bossSystem;
 
-    public KeyUsageListener(JavaPlugin plugin, BossSystem bossInstance) {
-        this.bossInstance = bossInstance;
+    public KeyUsageListener(JavaPlugin plugin, BossSystem bossSystem) {
+        this.bossSystem = bossSystem;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
     }
@@ -32,7 +32,7 @@ public class KeyUsageListener implements Listener {
         if (!event.getHand().equals(EquipmentSlot.HAND)) return;
         if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if (event.getClickedBlock() == null) return;
-        Boss boss = bossInstance.bossManager().bossByLocation(event.getClickedBlock().getLocation());
+        Boss boss = bossSystem.bossManager().bossByLocation(event.getClickedBlock().getLocation());
         if (boss == null) return;
         event.setCancelled(true);
         event.setUseInteractedBlock(DENY);
@@ -43,7 +43,7 @@ public class KeyUsageListener implements Listener {
             return;
         }
         if (boss.checkKey(event.getItem())) {
-            bossInstance.bossFightManager().allowEntrance(event.getPlayer().getUniqueId(), boss);
+            bossSystem.bossFightManager().allowEntrance(event.getPlayer().getUniqueId(), boss);
             notifyBossKeyUsage(event.getPlayer(), boss);
         } else {
             event.getPlayer().sendActionBar(Component.text("Der Schlüssel passt nicht zu diesem Boss.").color(NamedTextColor.RED));

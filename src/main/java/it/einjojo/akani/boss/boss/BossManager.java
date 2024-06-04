@@ -70,7 +70,7 @@ public class BossManager {
             return true;
         }).exceptionally(throwable -> {
             logger.severe("Failed to save boss " + boss.id());
-            throwable.printStackTrace();
+            throwable.fillInStackTrace();
             return false;
         });
     }
@@ -93,7 +93,7 @@ public class BossManager {
             return boss;
         }).exceptionally(throwable -> {
             logger.severe("Failed to load boss " + id);
-            throwable.printStackTrace();
+            throwable.fillInStackTrace();
             return null;
         });
     }
@@ -115,7 +115,7 @@ public class BossManager {
             return true;
         }).exceptionally(throwable -> {
             logger.severe("Failed to load bosses");
-            throwable.printStackTrace();
+            throwable.fillInStackTrace();
             return false;
         });
 

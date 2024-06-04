@@ -2,7 +2,6 @@ package it.einjojo.akani.boss.fight;
 
 import com.google.common.collect.ImmutableList;
 import it.einjojo.akani.boss.BossSystem;
-import it.einjojo.akani.boss.BossSystemPlugin;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.fight.state.defaults.StateLogicFactoryImpl;
 import org.bukkit.Bukkit;
@@ -89,7 +88,7 @@ public class BossFightManager {
 
 
     public BossFight startNewBossFight(Boss target) {
-        BossFight fight = new BossFight(this, new StateLogicFactoryImpl(bossSystem.roomManager(), bossMobRegistry), target);
+        BossFight fight = new BossFight(this, new StateLogicFactoryImpl(bossSystem.plugin(), bossSystem.roomManager(), bossMobRegistry), target);
         fight.setChangeListener(defaultChangeListener);
         activeBossFights.add(fight);
         return fight;
@@ -102,7 +101,7 @@ public class BossFightManager {
      */
     @Blocking
     public void closeBossFight(BossFight fight) {
-        Bukkit.getScheduler().runTask(BossSystemPlugin.instance(), () -> {
+        Bukkit.getScheduler().runTask(bossSystem.plugin(), () -> {
             fight.setState(BossFightState.CLOSED);
             World fightWorld = fight.fightRoom().world();
             Location location = fight.boss().keyRedeemLocation();
@@ -117,7 +116,7 @@ public class BossFightManager {
                 fight.boss().bossMob().despawn(mobUUID);
             }
         });
-        Bukkit.getScheduler().runTaskLater(BossSystemPlugin.instance(), () -> {
+        Bukkit.getScheduler().runTaskLater(bossSystem.plugin(), () -> {
             bossSystem.roomManager().deleteActiveRoom(fight.fightRoom());
         }, 20 * 10);
 
