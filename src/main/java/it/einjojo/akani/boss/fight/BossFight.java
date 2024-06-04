@@ -66,36 +66,34 @@ public class BossFight {
         try {
             bossFightManager.setPlayerBossFight(uuid, this);
             participants.add(uuid);
-            Location spawnLocation = fightRoom().world().getSpawnLocation();
-            JavaPlugin plugin = JavaPlugin.getPlugin(BossSystemPlugin.class);
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                if (participants().isEmpty()) {
-                    player.teleportAsync(spawnLocation);
-                } else {
-                    UUID target = null;
-                    for (UUID puuid : participants()) {
-                        target = puuid;
-                        if (!target.equals(player.getUniqueId())) {
-                            break;
-                        }
-                    }
-                    if (target == null) {
-                        player.teleportAsync(spawnLocation);
-                        return;
-                    }
-
-                    Player targetPlayer = Bukkit.getPlayer(target);
-                    if (targetPlayer == null) {
-                        player.teleportAsync(spawnLocation);
-                        return;
-                    }
-                    ;
-                    player.teleportAsync(targetPlayer.getLocation());
-                }
-            });
+            if (state != BossFightState.PREPARING) {
+                teleportPlayerToSpawnOrParticipant(player);
+            }
         } catch (Exception ex) {
             removeParticipant(uuid);
         }
+    }
+
+    public void teleportPlayerToSpawnOrParticipant(Player player) {
+        JavaPlugin plugin = JavaPlugin.getPlugin(BossSystemPlugin.class);
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            Location spawnLocation = fightRoom().world().getSpawnLocation();
+            if (participants().isEmpty()) {
+                player.teleportAsync(spawnLocation);
+            } else {
+                UUID target = getFirstNonMatchingParticipant(player.getUniqueId());
+                Player targetPlayer = target != null ? Bukkit.getPlayer(target) : null;
+                Location teleportLocation = targetPlayer != null ? targetPlayer.getLocation() : spawnLocation;
+                player.teleportAsync(teleportLocation);
+            }
+        });
+    }
+
+    public UUID getFirstNonMatchingParticipant(UUID uuid) {
+        return participants().stream()
+                .filter(puuid -> !puuid.equals(uuid))
+                .findFirst()
+                .orElse(null);
     }
 
     public void removeParticipant(UUID uuid) {
@@ -116,6 +114,7 @@ public class BossFight {
 
     public void setState(BossFightState state) {
         this.state = state;
+        stateLogic.disable();
         stateLogic = stateLogicFactory.createLogic(this);
     }
 

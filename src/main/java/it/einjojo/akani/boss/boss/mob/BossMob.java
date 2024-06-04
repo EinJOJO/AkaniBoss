@@ -2,7 +2,13 @@ package it.einjojo.akani.boss.boss.mob;
 
 import it.einjojo.akani.boss.fight.BossFight;
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
+/**
+ * @param <T> Entity type of the mob when spawned
+ */
 public interface BossMob<T> {
 
     /**
@@ -10,16 +16,22 @@ public interface BossMob<T> {
      */
     String mobName();
 
+
     /**
      * @param location the location where the mob should spawn
      * @return the spawned mob
      */
-    T spawn(Location location);
+    @NotNull
+    T spawn(@NotNull Location location);
 
     /**
      * @param fight the fight to check
      * @return true if the mob can spawn in the fight
      */
     boolean canSpawn(BossFight fight);
+
+    void despawn(UUID mobUuid);
+
+    BossMobFactory<?> factory();
 
 }

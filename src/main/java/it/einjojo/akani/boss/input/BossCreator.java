@@ -4,6 +4,8 @@ import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.boss.BossBuilder;
 import it.einjojo.akani.boss.boss.BossDifficulty;
+import it.einjojo.akani.boss.boss.mob.MythicBossMobFactory;
+import it.einjojo.akani.boss.boss.mob.VanillaMobFactory;
 import it.einjojo.akani.boss.room.RoomTemplate;
 import it.einjojo.akani.boss.util.TextUtil;
 import net.kyori.adventure.text.Component;
@@ -72,8 +74,7 @@ public class BossCreator {
                         }
                         bossBuilder.id(id);
                         sendMessage(player, "<green><i>ID gesetzt: <reset>" + id);
-                        step++;
-                        askForInput();
+                        next();
                     }), this::onCancel);
                 }
                 case 1 -> {
@@ -82,8 +83,7 @@ public class BossCreator {
                     new PlayerChatInput(player, ((name) -> {
                         bossBuilder.name(name);
                         sendMessage(player, "<green><i>Name gesetzt: <reset>" + name);
-                        step++;
-                        askForInput();
+                        next();
                     }), this::onCancel);
                 }
                 case 2 -> {
@@ -92,11 +92,11 @@ public class BossCreator {
                         try {
                             bossBuilder.level(Integer.parseInt(level));
                             sendMessage(player, "<green><i>Level gesetzt: <reset>" + level);
-                            step++;
+                            next();
                         } catch (NumberFormatException e) {
                             sendInputError(player, "Das Level muss eine Zahl sein!");
+                            askForInput();
                         }
-                        askForInput();
                     }), this::onCancel);
                 }
                 case 3 -> {
@@ -128,8 +128,7 @@ public class BossCreator {
                     new BlockSelectionInput(player, ((block) -> {
                         bossBuilder.keyRedeemLocation(block.getLocation());
                         sendMessage(player, "<green><i>Key-Block gesetzt: <reset>" + block.getType().name());
-                        step++;
-                        askForInput();
+                        next();
                     }), this::onCancel);
 
                 }
@@ -148,8 +147,7 @@ public class BossCreator {
                         }
                         bossBuilder.roomTemplateName(template);
                         sendMessage(player, "<green><i>Template-Welt gesetzt: <reset>" + template);
-                        step++;
-                        askForInput();
+                        next();
                     }), this::onCancel);
                 }
                 case 6 -> {
@@ -157,8 +155,7 @@ public class BossCreator {
                     sendMessage(player, "Wähle <blue>1. Ecke <gray>für den Eingang des Bossraumes aus.");
                     new BlockSelectionInput(player, ((block) -> {
                         loc1 = block.getLocation();
-                        step++;
-                        askForInput();
+                        next();
                     }), this::onCancel);
                 }
                 case 7 -> {
@@ -172,8 +169,7 @@ public class BossCreator {
                         }
                         bossBuilder.entranceBox(BoundingBox.of(loc1, loc2));
                         sendMessage(player, "<green><i>Boundary-Box erstellt!");
-                        step++;
-                        askForInput();
+                        next();
                     }), this::onCancel);
                 }
                 case 8 -> {
@@ -181,9 +177,22 @@ public class BossCreator {
                     new DropItemInput(player, ((item) -> {
                         bossBuilder.keyItem(item);
                         sendMessage(player, "<green><i>Schlüsselitem gesetzt!");
-                        step++;
-                        askForInput();
+                        next();
                     }), this::onCancel);
+                }
+                case 9 -> {
+                    sendMessage(player, "<gray>Wie heißt der Boss? <yellow>MythicMob-ID <gray>/ <yellow>Entity-Name <gray>(ZOMBIE,...)");
+                    new PlayerChatInput(player, ((input) -> {
+                        try {
+                            EntityType throwExceptionIfInvalid = EntityType.valueOf(input);
+                            bossBuilder.bossMob(new VanillaMobFactory().createBossMob(input));
+                        } catch (IllegalArgumentException ignore) {
+                            bossBuilder.bossMob(new MythicBossMobFactory().createBossMob(input));
+                        } finally {
+                            next();
+                        }
+                    }), this::onCancel);
+
                 }
 
                 default -> {
@@ -194,11 +203,16 @@ public class BossCreator {
         });
     }
 
-    private void sendMessage(Player player, String message) {
-        player.sendMessage(miniMessage.deserialize(progress() + ": <gray>" + message));
+    private void next() {
+        step++;
+        cleanup();
     }
 
-    private String progress() {
+    private void sendMessage(Player player, String message) {
+        player.sendMessage(miniMessage.deserialize(progressString() + ": <gray>" + message));
+    }
+
+    private String progressString() {
         return "<dark_gray>[<red>" + (step + 1) + "</red><gray>/</gray><red>" + (MAX_STEPS + 1) + "</red>] </dark_gray>";
     }
 

@@ -36,6 +36,8 @@ public class BossBuilder {
         this.entranceBox = boss.dungeonEntrance();
         this.roomTemplateName = boss.roomTemplateName();
         this.requirements = boss.requirements();
+        this.keyItem = boss.keyItem();
+        this.bossMob = boss.bossMob();
     }
 
     public BossBuilder id(String id) {
@@ -102,6 +104,7 @@ public class BossBuilder {
         if (entranceBox == null) throw new IllegalStateException("dungeonEntrance is null");
         if (requirements == null) throw new IllegalStateException("requirements is null");
         if (keyItem == null) throw new IllegalStateException("keyItem is null");
+        if (bossMob == null) throw new IllegalStateException("bossMob is null");
         return new Boss(id, name, roomTemplateName, level, difficulty, keyRedeemLocation, requirements, entranceBox, keyItem, bossMob);
     }
 

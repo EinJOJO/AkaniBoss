@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BossFightManager {
     private static final Duration ENTRANCE_TIMEOUT = Duration.ofSeconds(30);
     private final BossSystem bossSystem;
+    private final BossMobRegistry bossMobRegistry = new BossMobRegistry();
     private final List<BossFight> activeBossFights = new LinkedList<>();
     private final List<EntrancePermission> entrancePermissionList = new LinkedList<>();
     private final Map<UUID, BossFight> playerBossFights = new ConcurrentHashMap<>();
@@ -70,7 +71,7 @@ public class BossFightManager {
 
 
     public BossFight startNewBossFight(Boss target) {
-        BossFight fight = new BossFight(this, new StateLogicFactoryImpl(bossSystem.roomManager()), target);
+        BossFight fight = new BossFight(this, new StateLogicFactoryImpl(bossSystem.roomManager(), bossMobRegistry), target);
         activeBossFights.add(fight);
         return fight;
     }
@@ -82,20 +83,30 @@ public class BossFightManager {
      */
     @Blocking
     public void closeBossFight(BossFight fight) {
-        fight.setState(BossFightState.ENDING);
+        fight.setState(BossFightState.CLOSED);
         for (Player player : fight.participantsPlayers()) {
             player.teleport(fight.boss().keyRedeemLocation());
             fight.removeParticipant(player.getUniqueId());
         }
         activeBossFights.remove(fight);
+        UUID mobUUID = bossMobRegistry.getByFight(fight);
+        bossMobRegistry.unregister(fight);
+        fight.boss().bossMob().despawn(mobUUID);
         if (bossSystem.roomManager().deleteActiveRoom(fight.fightRoom())) {
-
         }
     }
 
 
     public List<BossFight> activeBossFights() {
         return ImmutableList.copyOf(activeBossFights);
+    }
+
+    public BossSystem bossSystem() {
+        return bossSystem;
+    }
+
+    public BossMobRegistry bossMobRegistry() {
+        return bossMobRegistry;
     }
 }
 

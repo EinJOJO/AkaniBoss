@@ -18,8 +18,17 @@ public enum BossFightState {
      */
     FIGHTING,
     /**
+     * If bossfight was won by player
+     */
+    VICTORY,
+    /**
+     *
+     */
+    DEFEATED,
+    /**
      * After the boss is defeated or player dies
      */
-    ENDING;
+    CLOSED;
+
 
 }

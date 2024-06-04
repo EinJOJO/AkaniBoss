@@ -37,6 +37,7 @@ public class TextUtil {
             if (c == '§') {
                 char number = chars[i + 1];
                 sb.append(MINIMESSAGE_REPLACEMENTS.get(number));
+                i++;
             } else {
                 sb.append(c);
             }

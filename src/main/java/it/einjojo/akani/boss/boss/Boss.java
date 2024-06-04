@@ -56,9 +56,11 @@ public record Boss(
         for (var requirement : requirements) {
             l8 = l8.append(Component.text(" [" + requirement.checkType().name() + "] " + requirement + ", ")).color(GRAY).appendNewline();
         }
+        var l9 = Component.text("Key Item: ").color(GRAY).append(Component.text(keyItem.toString()).color(PRIMARY)).appendNewline();
+        var l10 = Component.text("Mob: ").color(GRAY).append(Component.text(bossMob.toString()).color(PRIMARY)).appendNewline();
 
         return Component.text().append(l1).append(l2).append(l3).append(l4).append(l5).append(l6)
-                .append(l7).append(l8).build();
+                .append(l7).append(l8).append(l9).append(l10).build();
     }
 
     public Requirement testEntranceRequirements(Player player) {

@@ -3,9 +3,12 @@ package it.einjojo.akani.boss.storage.jsonfile.serializer;
 import com.google.gson.*;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.boss.BossDifficulty;
+import it.einjojo.akani.boss.boss.mob.BossMob;
+import it.einjojo.akani.boss.boss.mob.VanillaMob;
 import it.einjojo.akani.boss.requirement.Requirement;
 import it.einjojo.akani.boss.requirement.RequirementFactory;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 
@@ -38,6 +41,7 @@ public class JsonBossAdapter implements Adapter<Boss> {
         object.add("requirements", requirements);
         object.add("boundingBox", context.serialize(src.dungeonEntrance()));
         object.add("item", context.serialize(src.keyItem()));
+        object.add("mob", context.serialize(src.bossMob()));
         return object;
     }
 
@@ -64,7 +68,7 @@ public class JsonBossAdapter implements Adapter<Boss> {
                 requirements,
                 context.deserialize(object.get("boundingBox"), BoundingBox.class),
                 context.deserialize(object.get("item"), ItemStack.class),
-                null
+                object.has("mob") ? context.deserialize(object.get("mob"), BossMob.class) : new VanillaMob(EntityType.SLIME)
         );
     }
 }
