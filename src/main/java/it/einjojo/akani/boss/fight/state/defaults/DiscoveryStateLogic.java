@@ -85,10 +85,10 @@ public class DiscoveryStateLogic implements StateLogic {
     private void spawnBoss() {
         Bukkit.getScheduler().runTask(BossSystemPlugin.instance(), () -> {
             Object spawned = bossFight.boss().bossMob().spawn(bossSpawnLocation());
-            if (spawned instanceof ActiveMob mythicMob) {
-                bossMobRegistry.register(mythicMob.getParentUUID().get(), bossFight);
-            } else if (spawned instanceof Entity entity) {
+            if (spawned instanceof Entity entity) {
                 bossMobRegistry.register(entity.getUniqueId(), bossFight);
+            } else if (spawned instanceof ActiveMob mythicMob) {
+                bossMobRegistry.register(mythicMob.getParentUUID().get(), bossFight);
             } else {
                 log.warn("Spawned Boss could not be added to registry ");
             }
