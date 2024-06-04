@@ -16,11 +16,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class BossSystemPlugin extends JavaPlugin {
+    private static BossSystemPlugin instance;
     private BossSystem bossSystem;
     private LiteCommands<CommandSender> liteCommands;
 
+    public static BossSystemPlugin instance() {
+        return instance;
+    }
+
     @Override
     public void onEnable() {
+        instance = this;
         bossSystem = new BossSystem(this);
         bossSystem.roomManager().cleanupWorldContainer().thenRun(() -> {
             getLogger().info("World container cleaned up async.");

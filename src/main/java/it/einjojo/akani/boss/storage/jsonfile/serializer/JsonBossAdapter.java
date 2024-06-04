@@ -4,11 +4,10 @@ import com.google.gson.*;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.boss.BossDifficulty;
 import it.einjojo.akani.boss.boss.mob.BossMob;
-import it.einjojo.akani.boss.boss.mob.VanillaMob;
+import it.einjojo.akani.boss.boss.mob.VanillaMobFactory;
 import it.einjojo.akani.boss.requirement.Requirement;
 import it.einjojo.akani.boss.requirement.RequirementFactory;
 import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 
@@ -68,7 +67,7 @@ public class JsonBossAdapter implements Adapter<Boss> {
                 requirements,
                 context.deserialize(object.get("boundingBox"), BoundingBox.class),
                 context.deserialize(object.get("item"), ItemStack.class),
-                object.has("mob") ? context.deserialize(object.get("mob"), BossMob.class) : new VanillaMob(EntityType.SLIME)
+                object.has("mob") ? context.deserialize(object.get("mob"), BossMob.class) : new VanillaMobFactory().createBossMob("SLIME")
         );
     }
 }

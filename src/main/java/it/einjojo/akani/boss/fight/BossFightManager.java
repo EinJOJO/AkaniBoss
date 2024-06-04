@@ -28,10 +28,23 @@ public class BossFightManager {
     private final List<BossFight> activeBossFights = new LinkedList<>();
     private final List<EntrancePermission> entrancePermissionList = new LinkedList<>();
     private final Map<UUID, BossFight> playerBossFights = new ConcurrentHashMap<>();
+    private BossFight.Listener defaultChangeListener;
 
 
     public BossFightManager(BossSystem bossSystem) {
         this.bossSystem = bossSystem;
+    }
+
+
+    public BossFight.Listener defaultChangeListener() {
+        return defaultChangeListener;
+    }
+
+    public void setDefaultChangeListener(BossFight.Listener defaultChangeListener) {
+        this.defaultChangeListener = defaultChangeListener;
+        for (BossFight fight : activeBossFights) {
+            fight.setChangeListener(defaultChangeListener);
+        }
     }
 
     public void clearEntrance(UUID uuid, Boss boss) {
@@ -41,6 +54,7 @@ public class BossFightManager {
     public void allowEntrance(UUID uuid, Boss boss) {
         entrancePermissionList.add(new EntrancePermission(uuid, boss, System.currentTimeMillis() + ENTRANCE_TIMEOUT.toMillis()));
     }
+
 
     public boolean isAllowedToEnter(UUID uuid, Boss boss) {
         for (EntrancePermission permission : entrancePermissionList) {
@@ -72,6 +86,7 @@ public class BossFightManager {
 
     public BossFight startNewBossFight(Boss target) {
         BossFight fight = new BossFight(this, new StateLogicFactoryImpl(bossSystem.roomManager(), bossMobRegistry), target);
+        fight.setChangeListener(defaultChangeListener);
         activeBossFights.add(fight);
         return fight;
     }
@@ -93,6 +108,7 @@ public class BossFightManager {
         bossMobRegistry.unregister(fight);
         fight.boss().bossMob().despawn(mobUUID);
         if (bossSystem.roomManager().deleteActiveRoom(fight.fightRoom())) {
+
         }
     }
 
@@ -108,5 +124,6 @@ public class BossFightManager {
     public BossMobRegistry bossMobRegistry() {
         return bossMobRegistry;
     }
+
 }
 

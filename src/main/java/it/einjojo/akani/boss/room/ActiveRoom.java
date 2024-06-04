@@ -31,6 +31,19 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
         return WORLD_NAME_PREFIX + roomID.toString();
     }
 
+    public Location playerSpawnLocation() {
+        Location l = template.roomData().bossSpawnLocation().clone();
+        l.setWorld(world());
+        return l;
+    }
+
+    public Location bossSpawnLocation() {
+        Location l = template.roomData().bossSpawnLocation().clone();
+        l.setWorld(world());
+        return l;
+    }
+
+
     public World world() {
         return Bukkit.getWorld(worldName());
     }

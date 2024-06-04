@@ -1,7 +1,7 @@
 package it.einjojo.akani.boss.fight;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import it.einjojo.akani.boss.BossSystemPlugin;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.fight.state.StateLogic;
@@ -15,7 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 public class BossFight {
     @NotNull
@@ -25,9 +27,12 @@ public class BossFight {
     @NotNull
     private final Boss boss;
     @NotNull
-    private final Set<UUID> participants = new HashSet<>();
+    private final List<UUID> participants = new LinkedList<>();
+    private final List<UUID> allParticipants = new LinkedList<>();
     @NotNull
     private final Instant startedAt = Instant.now();
+    @Nullable
+    private transient Listener changeListener;
     @NotNull
     private BossFightState state;
     @NotNull
@@ -66,12 +71,24 @@ public class BossFight {
         try {
             bossFightManager.setPlayerBossFight(uuid, this);
             participants.add(uuid);
+            allParticipants.add(uuid);
+            if (changeListener != null) {
+                changeListener.onParticipantJoin(this, player);
+            }
             if (state != BossFightState.PREPARING) {
                 teleportPlayerToSpawnOrParticipant(player);
             }
         } catch (Exception ex) {
             removeParticipant(uuid);
         }
+    }
+
+    /**
+     * Participants that have participated. They might be dead already.
+     * @return the participants
+     */
+    public List<UUID> allParticipants() {
+        return ImmutableList.copyOf(allParticipants);
     }
 
     public void teleportPlayerToSpawnOrParticipant(Player player) {
@@ -89,6 +106,7 @@ public class BossFight {
         });
     }
 
+
     public UUID getFirstNonMatchingParticipant(UUID uuid) {
         return participants().stream()
                 .filter(puuid -> !puuid.equals(uuid))
@@ -99,6 +117,9 @@ public class BossFight {
     public void removeParticipant(UUID uuid) {
         participants.remove(uuid);
         bossFightManager.setPlayerBossFight(uuid, null);
+        if (changeListener != null) {
+            changeListener.onParticipantLeave(this, uuid);
+        }
     }
 
     public List<Player> participantsPlayers() {
@@ -116,6 +137,12 @@ public class BossFight {
         this.state = state;
         stateLogic.disable();
         stateLogic = stateLogicFactory.createLogic(this);
+        if (changeListener != null) {
+            switch (state) {
+                case VICTORY -> changeListener.onVictory(this);
+                case DEFEATED -> changeListener.onDefeat(this);
+            }
+        }
     }
 
     public boolean isParticipant(UUID uuid) {
@@ -147,8 +174,29 @@ public class BossFight {
         return fightRoom;
     }
 
-    public Set<UUID> participants() {
-        return ImmutableSet.copyOf(participants);
+    public List<UUID> participants() {
+        return ImmutableList.copyOf(participants);
+    }
+
+    public void setChangeListener(@Nullable Listener changeListener) {
+        this.changeListener = changeListener;
+    }
+
+    @Nullable
+    public Listener changeListener() {
+        return changeListener;
+    }
+
+    public interface Listener {
+        void onParticipantJoin(BossFight fight, Player player);
+
+        void onParticipantLeave(BossFight fight, UUID uuid);
+
+        void onVictory(BossFight fight);
+
+        void onDefeat(BossFight fight);
+
+
     }
 
 }

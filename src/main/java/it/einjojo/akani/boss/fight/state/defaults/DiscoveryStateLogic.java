@@ -1,6 +1,7 @@
 package it.einjojo.akani.boss.fight.state.defaults;
 
 import io.lumine.mythic.core.mobs.ActiveMob;
+import it.einjojo.akani.boss.BossSystemPlugin;
 import it.einjojo.akani.boss.fight.BossFight;
 import it.einjojo.akani.boss.fight.BossFightState;
 import it.einjojo.akani.boss.fight.BossMobRegistry;
@@ -8,6 +9,7 @@ import it.einjojo.akani.boss.fight.state.StateLogic;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -81,14 +83,16 @@ public class DiscoveryStateLogic implements StateLogic {
     }
 
     private void spawnBoss() {
-        Object spawned = bossFight.boss().bossMob().spawn(bossSpawnLocation());
-        if (spawned instanceof ActiveMob mythicMob) {
-            bossMobRegistry.register(mythicMob.getParentUUID().get(), bossFight);
-        } else if (spawned instanceof Entity entity) {
-            bossMobRegistry.register(entity.getUniqueId(), bossFight);
-        } else {
-            log.warn("Spawned Boss could not be added to registry ");
-        }
+        Bukkit.getScheduler().runTask(BossSystemPlugin.instance(), () -> {
+            Object spawned = bossFight.boss().bossMob().spawn(bossSpawnLocation());
+            if (spawned instanceof ActiveMob mythicMob) {
+                bossMobRegistry.register(mythicMob.getParentUUID().get(), bossFight);
+            } else if (spawned instanceof Entity entity) {
+                bossMobRegistry.register(entity.getUniqueId(), bossFight);
+            } else {
+                log.warn("Spawned Boss could not be added to registry ");
+            }
+        });
     }
 
     private @Nullable Player findPlayerNearBossSpawn(List<Player> players) {
