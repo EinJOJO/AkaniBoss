@@ -53,15 +53,19 @@ public record Boss(
         var l5 = Component.text("Key Redeem Location: ").color(GRAY).append(Component.text("%f.1 %f.1 %f.1".formatted(keyRedeemLocation.getX(), keyRedeemLocation.getY(), keyRedeemLocation.getZ())).color(PRIMARY)).appendNewline();
         var l6 = Component.text("Entrance Box: ").append(Component.text(dungeonEntrance.toString()).color(PRIMARY)).appendNewline();
         var l7 = Component.text("Room Template: ").color(GRAY).append(Component.text(roomTemplateName).color(PRIMARY)).appendNewline();
-        var l8 = Component.text(" Requirements: ").appendNewline();
+        var l8 = Component.text("Requirements: ").appendNewline();
         for (var requirement : requirements) {
-            l8 = l8.append(Component.text(" [" + requirement.checkType().name() + "] " + requirement + ", ")).color(GRAY).appendNewline();
+            l8 = l8.append(Component.text("[" + requirement.checkType().name() + "]", NamedTextColor.DARK_GRAY).append(Component.text(requirement + ", ")).color(PRIMARY)).appendNewline();
         }
-        var l9 = Component.text("Key Item: ").color(GRAY).append(Component.text(keyItem.toString()).color(PRIMARY)).appendNewline();
-        var l10 = Component.text("Mob: ").color(GRAY).append(Component.text(bossMob.toString()).color(PRIMARY)).appendNewline();
+        var l9 = Component.text("Key Item: ", GRAY).append(Component.text(keyItem.toString()).color(PRIMARY)).appendNewline();
+        var l10 = Component.text("Mob: ").append(Component.text(bossMob.toString()).color(PRIMARY)).appendNewline();
+        var l11 = Component.text("Loot: ").appendNewline();
+        for (var loot : lootList) {
+            l11 = l11.append(Component.text(loot.toString()).color(PRIMARY)).appendNewline();
+        }
 
         return Component.text().append(l1).append(l2).append(l3).append(l4).append(l5).append(l6)
-                .append(l7).append(l8).append(l9).append(l10).build();
+                .append(l7).append(l8).append(l9).append(l10).appendNewline().append(l11).build();
     }
 
     public Requirement testEntranceRequirements(Player player) {

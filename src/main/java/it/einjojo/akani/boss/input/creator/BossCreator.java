@@ -211,9 +211,9 @@ public class BossCreator {
                     sendMessage(player, "Lege die Belohnungen für den Boss fest");
                     new LootListCreator(bossSystem.plugin(), player, (loots) -> {
                         bossBuilder.lootList(loots);
+                        next();
                     }, new LootFactory(new EconomyFactory().createEconomy()));
                 }
-
                 default -> {
                     sendInputError(player, "Unbekannter Schritt (" + step + ") erreicht!");
                     cleanup();

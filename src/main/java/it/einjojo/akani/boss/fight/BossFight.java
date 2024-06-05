@@ -6,6 +6,7 @@ import it.einjojo.akani.boss.BossSystemPlugin;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.fight.state.StateLogic;
 import it.einjojo.akani.boss.fight.state.StateLogicFactory;
+import it.einjojo.akani.boss.fight.state.defaults.DiscoveryStateLogic;
 import it.einjojo.akani.boss.room.ActiveRoom;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -40,7 +41,6 @@ public class BossFight {
     @Nullable
     private ActiveRoom fightRoom;
 
-
     public BossFight(@NotNull BossFightManager bossFightManager, @NotNull StateLogicFactory stateLogicFactory, @NotNull Boss boss) {
         Preconditions.checkNotNull(bossFightManager);
         Preconditions.checkNotNull(stateLogicFactory);
@@ -50,6 +50,16 @@ public class BossFight {
         this.boss = boss;
         state = BossFightState.PREPARING;
         stateLogic = stateLogicFactory.createLogic(this);
+    }
+
+    public boolean isRunning() {
+        if (state.equals(BossFightState.INTRODUCTION)) {
+            return true;
+        } else if (state.equals(BossFightState.DISCOVERY)) {
+            return true;
+        }
+        return state.equals(BossFightState.FIGHTING);
+
     }
 
     /**

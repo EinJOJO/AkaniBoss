@@ -33,6 +33,11 @@ public interface BossMob<T> {
 
     void despawn(UUID mobUuid);
 
+    /**
+     * Factory to create the mob
+     *
+     * @return the factory
+     */
     BossMobFactory<?> factory();
 
 }

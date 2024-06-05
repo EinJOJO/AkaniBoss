@@ -65,9 +65,6 @@ public class FightListener implements Listener, BossFight.Listener {
         if (bossFight == null) return;
         Player diedPlayer = event.getPlayer();
         bossFight.removeParticipant(diedPlayer.getUniqueId());
-        if (bossFight.stateLogic() instanceof DiscoveryStateLogic discoveryStateLogic) {
-            diedPlayer.hideBossBar(discoveryStateLogic.findBossRoomBossBar());
-        }
         if (bossFight.participants().isEmpty()) {
             bossFight.setState(BossFightState.DEFEATED);
         }
@@ -75,6 +72,7 @@ public class FightListener implements Listener, BossFight.Listener {
         bossFight.participantsPlayers().forEach(player -> player.sendMessage(miniMessage().deserialize("<red><player> ist gestorben!",
                 Placeholder.parsed("player", diedPlayer.getName()))
         ));
+
         event.deathMessage(null);
         Bukkit.getScheduler().runTask(plugin, () -> {
             diedPlayer.spigot().respawn();
@@ -88,7 +86,9 @@ public class FightListener implements Listener, BossFight.Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         BossFight fight = bossFightManager.bossMobRegistry().getByMobId(event.getEntity().getUniqueId());
         if (fight == null) return;
-        fight.setState(BossFightState.VICTORY);
+        if (fight.isRunning()) {
+            fight.setState(BossFightState.VICTORY);
+        }
     }
 
 
@@ -106,9 +106,13 @@ public class FightListener implements Listener, BossFight.Listener {
 
     @Override
     public void onParticipantLeave(BossFight fight, UUID uuid) {
-        fight.participantsPlayers().forEach(player -> player.sendMessage(miniMessage().deserialize("<red><player> hat den Kampf verlassen!",
-                Placeholder.parsed("player", Bukkit.getPlayer(uuid).getName()))
-        ));
+        Player removedPlayer = Bukkit.getPlayer(uuid);
+        if (removedPlayer != null) {
+            if (fight.stateLogic() instanceof DiscoveryStateLogic discoveryStateLogic) {
+                removedPlayer.hideBossBar(discoveryStateLogic.findBossRoomBossBar());
+            }
+        }
+
     }
 
     @Override

@@ -6,7 +6,16 @@ import io.lumine.mythic.core.mobs.ActiveMob;
 import io.lumine.mythic.core.mobs.MobExecutor;
 
 public class MythicBossMobFactory implements BossMobFactory<ActiveMob> {
-    private final MobExecutor mythicMobs = MythicBukkit.inst().getMobManager();
+    private final MobExecutor mythicMobs;
+
+    public MythicBossMobFactory() {
+        try {
+            this.mythicMobs = MythicBukkit.inst().getMobManager();
+        } catch (NoClassDefFoundError e) {
+            throw new IllegalStateException("MythicMobs not found. Is the plugin installed?");
+        }
+    }
+
 
     /**
      * @param name the name of the mob
