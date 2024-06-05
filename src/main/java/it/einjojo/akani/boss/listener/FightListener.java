@@ -4,6 +4,7 @@ import it.einjojo.akani.boss.fight.BossFight;
 import it.einjojo.akani.boss.fight.BossFightManager;
 import it.einjojo.akani.boss.fight.BossFightState;
 import it.einjojo.akani.boss.fight.state.defaults.DiscoveryStateLogic;
+import it.einjojo.akani.boss.loot.Loot;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -21,6 +22,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -112,12 +114,16 @@ public class FightListener implements Listener, BossFight.Listener {
     @Override
     public void onVictory(BossFight fight) {
         bossFightManager.closeBossFight(fight);
-        fight.allParticipantPlayers().forEach(player -> {
+        List<Player> allParticipants = fight.allParticipantPlayers();
+        for (Player player : allParticipants) {
             player.sendMessage(miniMessage().deserialize("<green>Der Boss wurde besiegt!"));
             player.sendMessage(miniMessage().deserialize("<yellow>Zeit: <green><time> Sekunden",
                     Placeholder.parsed("time", String.valueOf(Duration.ofMillis(System.currentTimeMillis() - fight.startedAt()).toSeconds()))
             ));
-        });
+        }
+        for (Loot loot : fight.boss().lootList()) {
+            loot.grant(allParticipants);
+        }
         spawnFireworks(fight.boss().keyRedeemLocation());
     }
 
@@ -128,7 +134,8 @@ public class FightListener implements Listener, BossFight.Listener {
         Bukkit.getScheduler().runTaskTimer(plugin, (task) -> {
             if (amount.decrementAndGet() == 0) {
                 task.cancel();
-            };
+            }
+            ;
             Location spawnLocation = center.clone();
             spawnLocation.add(random.nextInt(10) - 5, 0, random.nextInt(10) - 5);
             Firework firework = center.getWorld().spawn(spawnLocation, Firework.class);

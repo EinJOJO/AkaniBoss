@@ -1,24 +1,30 @@
 package it.einjojo.akani.boss.loot;
 
+import it.einjojo.akani.boss.integration.economy.Economy;
 import org.bukkit.inventory.ItemStack;
 
 public class LootFactory {
 
-    public LootChancedItem item(ItemStack itemStack, float chance) {
-        return null;
+    private final Economy economy;
+
+    public LootFactory(Economy economy) {
+        this.economy = economy;
     }
 
-    public LootFixedMoney money(int amount) {
-        return null;
+    public LootFixedItem createFixedItem(ItemStack itemStack) {
+        return new LootFixedItem(itemStack);
     }
 
-
-    public boolean isVaultSupported() {
-        return false;
+    public LootFixedMoney createFixedMoney(int amount) {
+        return new LootFixedMoney(amount, economy);
     }
 
-    public boolean isAkaniEconomySupported() {
-        return false;
+    public LootRangeMoney createRangeMoney(int min, int max) {
+        return new LootRangeMoney(min, max, economy);
+    }
+
+    public LootChancedItem createChancedItem(ItemStack itemStack, float chance) {
+        return new LootChancedItem(itemStack, chance);
     }
 
 }

@@ -1,4 +1,4 @@
-package it.einjojo.akani.boss.input;
+package it.einjojo.akani.boss.input.creator;
 
 import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
@@ -6,6 +6,9 @@ import it.einjojo.akani.boss.boss.BossBuilder;
 import it.einjojo.akani.boss.boss.BossDifficulty;
 import it.einjojo.akani.boss.boss.mob.MythicBossMobFactory;
 import it.einjojo.akani.boss.boss.mob.VanillaMobFactory;
+import it.einjojo.akani.boss.input.BlockSelectionInput;
+import it.einjojo.akani.boss.input.DropItemInput;
+import it.einjojo.akani.boss.input.PlayerChatInput;
 import it.einjojo.akani.boss.room.RoomTemplate;
 import it.einjojo.akani.boss.util.TextUtil;
 import net.kyori.adventure.text.Component;
@@ -184,14 +187,16 @@ public class BossCreator {
                     sendMessage(player, "<gray>Wie heißt der Boss? <yellow>MythicMob-ID <gray>/ <yellow>Entity-Name <gray>(ZOMBIE,...)");
                     new PlayerChatInput(player, ((input) -> {
                         try {
-                            EntityType throwExceptionIfInvalid = EntityType.valueOf(input);
                             bossBuilder.bossMob(new VanillaMobFactory().createBossMob(input));
+                            sendMessage(player, "<green><i>Boss-Mob auf Vanilla gesetzt!");
                             next();
                             return;
                         } catch (IllegalArgumentException ignore) {
                         }
                         try {
                             bossBuilder.bossMob(new MythicBossMobFactory().createBossMob(input));
+                            sendMessage(player, "<green><i>Boss-Mob auf MythicMob gesetzt!");
+                            next();
                         } catch (IllegalArgumentException ignore) {
                             sendInputError(player, "Dieses Mob existiert nicht!");
                             askForInput();

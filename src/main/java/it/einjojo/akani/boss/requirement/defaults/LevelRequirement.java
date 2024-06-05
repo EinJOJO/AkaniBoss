@@ -13,16 +13,6 @@ public class LevelRequirement implements Requirement {
         min_level = minLevel;
     }
 
-    public static LevelRequirement ofArgs(String[] args) {
-        int minLevel = args.length >= 1 ? Integer.parseInt(args[1]) : 0;
-        return new LevelRequirement(minLevel);
-    }
-
-    @Override
-    public String requirementName() {
-        return "level";
-    }
-
     @Override
     public boolean check(Boss boss, Player player) {
         return player.getLevel() >= min_level;
@@ -35,6 +25,6 @@ public class LevelRequirement implements Requirement {
 
     @Override
     public String toString() {
-        return NAME + ":" + min_level;
+        return NAME + ARGUMENT_SPLITTER + min_level;
     }
 }

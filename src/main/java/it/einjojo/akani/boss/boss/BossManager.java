@@ -6,17 +6,18 @@ import it.einjojo.akani.boss.storage.StorageException;
 import it.einjojo.akani.boss.util.HologramUtil;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Logger;
 
 public class BossManager {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BossManager.class);
     private final Map<String, Boss> bosses = new HashMap<>();
     private final Map<Location, String> keyLocToBossIDMap = new HashMap<>();
     private final BossStorage storage;
-    private final Logger logger = Logger.getLogger("BossManager");
+
 
     public BossManager(BossStorage storage) {
         this.storage = storage;
@@ -26,14 +27,14 @@ public class BossManager {
         bosses.put(boss.id(), boss);
         keyLocToBossIDMap.put(boss.keyRedeemLocation(), boss.id());
         HologramUtil.createBossHologram(boss.keyRedeemLocation().clone().toCenterLocation().add(0, 3, 0), boss);
-        logger.info("Registered boss " + boss.id());
+        logger.info("Registered boss {}", boss.id());
     }
 
     public void unregisterBoss(Boss boss) {
         bosses.remove(boss.id());
         keyLocToBossIDMap.remove(boss.keyRedeemLocation());
         HologramUtil.removeBossHologram(boss);
-        logger.info("Unregistered boss " + boss.id());
+        logger.info("Unregistered boss {}", boss.id());
     }
 
     public Map<String, Boss> bosses() {
@@ -61,7 +62,7 @@ public class BossManager {
 
     public CompletableFuture<Boolean> saveBoss(Boss boss) {
         return CompletableFuture.supplyAsync(() -> {
-            logger.info("Saving boss " + boss.id());
+            logger.info("Saving boss {}", boss.id());
             try {
                 storage.saveBoss(boss);
             } catch (StorageException e) {
@@ -69,7 +70,7 @@ public class BossManager {
             }
             return true;
         }).exceptionally(throwable -> {
-            logger.severe("Failed to save boss " + boss.id());
+            logger.error("Failed to save boss {}", boss.id());
             throwable.fillInStackTrace();
             return false;
         });
@@ -92,7 +93,7 @@ public class BossManager {
             }
             return boss;
         }).exceptionally(throwable -> {
-            logger.severe("Failed to load boss " + id);
+            logger.error("Failed to load boss {}", id);
             throwable.fillInStackTrace();
             return null;
         });
@@ -111,10 +112,10 @@ public class BossManager {
             }
         }).thenApply((list) -> {
             list.forEach(this::registerBoss);
-            logger.info("Loaded " + list.size() + " bosses");
+            logger.info("Loaded {} bosses", list.size());
             return true;
         }).exceptionally(throwable -> {
-            logger.severe("Failed to load bosses");
+            logger.error("Failed to load bosses");
             throwable.fillInStackTrace();
             return false;
         });

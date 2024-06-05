@@ -1,6 +1,7 @@
 package it.einjojo.akani.boss.boss;
 
 import it.einjojo.akani.boss.boss.mob.BossMob;
+import it.einjojo.akani.boss.loot.Loot;
 import it.einjojo.akani.boss.requirement.Requirement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -34,7 +35,8 @@ public record Boss(
         List<Requirement> requirements,
         BoundingBox dungeonEntrance,
         ItemStack keyItem,
-        BossMob<?> bossMob
+        BossMob<?> bossMob,
+        List<Loot> lootList
 ) {
 
     public Component bossNameComponent() {

@@ -115,6 +115,9 @@ public class DiscoveryStateLogic implements StateLogic {
     private void spawnBoss() {
         Bukkit.getScheduler().runTask(plugin, () -> {
             Object spawned = bossFight.boss().bossMob().spawn(bossSpawnLocation());
+            if (spawned == null) {
+                bossFight.setState(BossFightState.FATAL_EXCEPTION);
+            }
             try {
                 if (spawned instanceof Entity entity) {
                     bossUuid = entity.getUniqueId();

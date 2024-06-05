@@ -138,7 +138,7 @@ public class RoomManager {
      * @param activeRoom
      */
     public void deleteActiveRoom(ActiveRoom activeRoom) {
-        toBeDeletedWorldName.remove(activeRoom.worldName());
+        toBeDeletedWorldName.add(activeRoom.worldName());
         activeRoom.unloadWorld();
         loadedRooms.remove(activeRoom);
 

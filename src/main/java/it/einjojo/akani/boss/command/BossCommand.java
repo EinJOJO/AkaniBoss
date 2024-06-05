@@ -7,20 +7,12 @@ import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
-import it.einjojo.akani.boss.boss.BossBuilder;
-import it.einjojo.akani.boss.boss.BossDifficulty;
-import it.einjojo.akani.boss.input.BossCreator;
+import it.einjojo.akani.boss.input.creator.BossCreator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.BoundingBox;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 

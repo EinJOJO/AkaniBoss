@@ -64,6 +64,7 @@ public record ActiveRoom(UUID roomID, RoomTemplate template) {
                     return;
                 }
                 // Apply default gamerules.
+                world.setDifficulty(Difficulty.NORMAL);
                 world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
                 world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
                 world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);

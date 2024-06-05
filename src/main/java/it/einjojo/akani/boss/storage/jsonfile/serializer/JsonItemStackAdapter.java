@@ -12,7 +12,7 @@ public class JsonItemStackAdapter implements Adapter<ItemStack> {
         try {
             return Base64ItemStack.decode(json.getAsString());
         } catch (Base64ItemStack.Base64ConvertException exception) {
-            throw new JsonParseException("Invalid base64 item: " + json.getAsString(), exception);
+            throw new JsonParseException("Invalid base64 itemStack: " + json.getAsString(), exception);
         }
     }
 

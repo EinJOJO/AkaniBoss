@@ -18,23 +18,10 @@ public class MinimumPlayerKeyRedeemRequirement implements Requirement {
         this.checkRadius = checkRadius;
     }
 
-    public static MinimumPlayerKeyRedeemRequirement ofArgs(String[] args) {
-        if (args.length < 2) {
-            return null;
-        }
-        int minPlayers = Integer.parseInt(args[1]);
-        double radius = args.length > 2 ? Double.parseDouble(args[2]) : 10;
-        return new MinimumPlayerKeyRedeemRequirement(minPlayers, radius);
-    }
-
-    @Override
-    public String requirementName() {
-        return NAME;
-    }
 
     @Override
     public String toString() {
-        return NAME + ":" + minimumPlayers + ":" + checkRadius;
+        return NAME + ARGUMENT_SPLITTER + minimumPlayers + ARGUMENT_SPLITTER + checkRadius;
     }
 
     @Override

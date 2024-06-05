@@ -3,6 +3,7 @@ package it.einjojo.akani.boss.boss.mob;
 import it.einjojo.akani.boss.fight.BossFight;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -19,9 +20,9 @@ public interface BossMob<T> {
 
     /**
      * @param location the location where the mob should spawn
-     * @return the spawned mob
+     * @return the spawned mob or null if exception occurred
      */
-    @NotNull
+    @Nullable
     T spawn(@NotNull Location location);
 
     /**

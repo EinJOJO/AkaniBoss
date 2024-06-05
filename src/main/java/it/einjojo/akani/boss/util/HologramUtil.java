@@ -7,6 +7,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 
+@Deprecated
 public class HologramUtil {
     private static final String HOLOGRAM_PREFIX = "boss_";
 

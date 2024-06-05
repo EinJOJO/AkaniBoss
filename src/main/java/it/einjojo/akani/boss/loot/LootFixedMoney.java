@@ -1,15 +1,15 @@
 package it.einjojo.akani.boss.loot;
 
+import it.einjojo.akani.boss.integration.economy.Economy;
 import org.bukkit.entity.Player;
 
-public record LootFixedMoney(int amount) implements Loot {
-    @Override
-    public String id() {
-        return "money";
-    }
+import java.util.Collection;
+
+public record LootFixedMoney(int amount, Economy economy) implements Loot {
+
 
     @Override
-    public void grant(Player player) {
+    public void grant(Collection<Player> players) {
 
     }
 }

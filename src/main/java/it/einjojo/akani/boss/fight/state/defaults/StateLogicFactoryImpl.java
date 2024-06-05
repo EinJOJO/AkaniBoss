@@ -10,16 +10,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 public class StateLogicFactoryImpl implements StateLogicFactory {
+    @NotNull
     private final JavaPlugin plugin;
     @NotNull
     private final RoomManager roomManager;
     @NotNull
     private final BossMobRegistry bossMobRegistry;
 
-    public StateLogicFactoryImpl(JavaPlugin plugin, @NotNull RoomManager roomManager, @NotNull BossMobRegistry bossMobRegistry) {
-        this.plugin = plugin;
+    public StateLogicFactoryImpl(@NotNull JavaPlugin plugin, @NotNull RoomManager roomManager, @NotNull BossMobRegistry bossMobRegistry) {
+        Preconditions.checkNotNull(plugin);
         Preconditions.checkNotNull(roomManager);
         Preconditions.checkNotNull(bossMobRegistry);
+        this.plugin = plugin;
         this.bossMobRegistry = bossMobRegistry;
         this.roomManager = roomManager;
 

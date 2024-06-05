@@ -4,9 +4,12 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import it.einjojo.akani.boss.boss.BossManager;
 import it.einjojo.akani.boss.fight.BossFightManager;
+import it.einjojo.akani.boss.integration.economy.EconomyFactory;
 import it.einjojo.akani.boss.listener.FightListener;
 import it.einjojo.akani.boss.listener.InputListener;
 import it.einjojo.akani.boss.listener.KeyUsageListener;
+import it.einjojo.akani.boss.listener.RoomListener;
+import it.einjojo.akani.boss.loot.LootFactory;
 import it.einjojo.akani.boss.requirement.RequirementFactory;
 import it.einjojo.akani.boss.room.RoomManager;
 import it.einjojo.akani.boss.storage.jsonfile.GsonFactory;
@@ -28,9 +31,10 @@ public class BossSystem {
         Preconditions.checkNotNull(plugin);
         this.plugin = plugin;
         this.bossFightManager = new BossFightManager(this);
-        this.gson = new GsonFactory(new RequirementFactory(bossFightManager)).createGson();
+        this.gson = new GsonFactory().createGson(new RequirementFactory(bossFightManager), new LootFactory(new EconomyFactory().createEconomy()));
         this.bossManager = new BossManager(new JsonFileBossStorage(gson, plugin.getDataFolder().toPath().resolve("boss/")));
         this.roomManager = new RoomManager(plugin, this);
+
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             load();
             registerListener();
@@ -47,6 +51,7 @@ public class BossSystem {
         new InputListener(plugin());
         new KeyUsageListener(plugin(), this);
         new FightListener(bossFightManager(), plugin());
+        new RoomListener(roomManager(), plugin());
     }
 
     public void startTasks() {

@@ -2,13 +2,14 @@ package it.einjojo.akani.boss.boss;
 
 
 import it.einjojo.akani.boss.boss.mob.BossMob;
+import it.einjojo.akani.boss.loot.Loot;
 import it.einjojo.akani.boss.requirement.Requirement;
 import it.einjojo.akani.boss.requirement.RequirementFactory;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class BossBuilder {
@@ -19,9 +20,10 @@ public class BossBuilder {
     private Location keyRedeemLocation;
     private BoundingBox entranceBox;
     private String roomTemplateName;
-    private List<Requirement> requirements = new ArrayList<>(List.of(RequirementFactory.unlockedWithKeyRequirement()));
+    private List<Requirement> requirements = new LinkedList<>(List.of(RequirementFactory.unlockedWithKeyRequirement()));
     private ItemStack keyItem;
     private BossMob<?> bossMob;
+    private List<Loot> lootList = new LinkedList<>();
 
 
     public BossBuilder() {
@@ -96,6 +98,16 @@ public class BossBuilder {
         return this;
     }
 
+    public BossBuilder lootList(List<Loot> lootList) {
+        this.lootList = lootList;
+        return this;
+    }
+
+    public BossBuilder addLoot(Loot loot) {
+        this.lootList.add(loot);
+        return this;
+    }
+
     public Boss build() {
         if (id == null) throw new IllegalStateException("id is null");
         if (name == null) throw new IllegalStateException("name is null");
@@ -105,7 +117,7 @@ public class BossBuilder {
         if (requirements == null) throw new IllegalStateException("requirements is null");
         if (keyItem == null) throw new IllegalStateException("keyItem is null");
         if (bossMob == null) throw new IllegalStateException("bossMob is null");
-        return new Boss(id, name, roomTemplateName, level, difficulty, keyRedeemLocation, requirements, entranceBox, keyItem, bossMob);
+        return new Boss(id, name, roomTemplateName, level, difficulty, keyRedeemLocation, requirements, entranceBox, keyItem, bossMob, lootList);
     }
 
 }

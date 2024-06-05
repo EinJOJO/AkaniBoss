@@ -11,8 +11,6 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -53,27 +51,27 @@ public record JsonFileBossStorage(Gson gson, Path bossFolder) implements BossSto
         }
     }
 
-@Override
-public List<Boss> loadAllBosses() throws StorageException {
-    List<Boss> result = new ArrayList<>();
-    try {
-        Files.createDirectories(bossFolder);
-        try (Stream<Path> paths = Files.list(bossFolder)) {
-            paths.filter(path -> path.toString().endsWith(".json"))
-                .forEach(path -> {
-                    try {
-                        Boss boss = loadBossByPath(path);
-                        if (boss != null) {
-                            result.add(boss);
-                        }
-                    } catch (StorageException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+    @Override
+    public List<Boss> loadAllBosses() throws StorageException {
+        List<Boss> result = new ArrayList<>();
+        try {
+            Files.createDirectories(bossFolder);
+            try (Stream<Path> paths = Files.list(bossFolder)) {
+                paths.filter(path -> path.toString().endsWith(".json"))
+                        .forEach(path -> {
+                            try {
+                                Boss boss = loadBossByPath(path);
+                                if (boss != null) {
+                                    result.add(boss);
+                                }
+                            } catch (StorageException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+            }
+        } catch (IOException | RuntimeException e) {
+            throw new StorageException(e);
         }
-    } catch (IOException | RuntimeException e) {
-        throw new StorageException(e);
+        return result;
     }
-    return result;
-}
 }

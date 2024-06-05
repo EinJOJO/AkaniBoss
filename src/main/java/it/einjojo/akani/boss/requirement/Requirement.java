@@ -1,5 +1,6 @@
 package it.einjojo.akani.boss.requirement;
 
+import com.google.gson.JsonObject;
 import it.einjojo.akani.boss.boss.Boss;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -10,8 +11,7 @@ import org.bukkit.entity.Player;
  * <p> or when he enters the Boss-Room</p>
  */
 public interface Requirement {
-
-    String requirementName();
+    String ARGUMENT_SPLITTER = ";";
 
     /**
      * @param boss   the boss that has the requirement.

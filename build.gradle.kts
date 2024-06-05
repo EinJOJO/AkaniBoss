@@ -64,6 +64,10 @@ tasks {
 
     shadowJar {
         minimize()
+        archiveBaseName.set("AkaniBoss")
+        archiveVersion.set("")
+        archiveClassifier.set("")
+
     }
 
     runServer {

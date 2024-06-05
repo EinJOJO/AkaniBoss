@@ -1,6 +1,7 @@
-package it.einjojo.akani.boss.input;
+package it.einjojo.akani.boss.input.creator;
 
 import com.google.common.base.Preconditions;
+import it.einjojo.akani.boss.input.BlockSelectionInput;
 import it.einjojo.akani.boss.room.ActiveRoom;
 import it.einjojo.akani.boss.room.RoomData;
 import it.einjojo.akani.boss.room.RoomManager;

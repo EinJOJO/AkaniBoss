@@ -6,7 +6,7 @@ import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.command.resolver.TemplateName;
-import it.einjojo.akani.boss.input.RoomCreator;
+import it.einjojo.akani.boss.input.creator.RoomCreator;
 import it.einjojo.akani.boss.room.RoomManager;
 import it.einjojo.akani.boss.room.RoomTemplate;
 import org.bukkit.command.CommandSender;
