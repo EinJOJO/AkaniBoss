@@ -9,3 +9,5 @@
 # GitHub Copilot persisted chat sessions
 /copilot/chatSessions
 /material_theme_project_new.xml
+/webServers.xml
+/deployment.xml

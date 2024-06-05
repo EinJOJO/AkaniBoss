@@ -9,6 +9,8 @@ import it.einjojo.akani.boss.boss.mob.VanillaMobFactory;
 import it.einjojo.akani.boss.input.BlockSelectionInput;
 import it.einjojo.akani.boss.input.DropItemInput;
 import it.einjojo.akani.boss.input.PlayerChatInput;
+import it.einjojo.akani.boss.integration.economy.EconomyFactory;
+import it.einjojo.akani.boss.loot.LootFactory;
 import it.einjojo.akani.boss.room.RoomTemplate;
 import it.einjojo.akani.boss.util.TextUtil;
 import net.kyori.adventure.text.Component;
@@ -25,7 +27,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.util.BoundingBox;
 
 public class BossCreator {
-    private static final int MAX_STEPS = 10;
+    private static final int MAX_STEPS = 11;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final BossSystem bossSystem;
     private final BossBuilder bossBuilder = new BossBuilder();
@@ -49,7 +51,8 @@ public class BossCreator {
             if (step == MAX_STEPS) {
                 Boss boss = bossBuilder.build();
                 bossSystem.bossManager().registerBoss(boss);
-                bossSystem.bossManager().saveBoss(boss).thenRun(() -> {
+                Bukkit.getScheduler().runTaskAsynchronously(bossSystem.plugin(), () -> {
+                    bossSystem.bossManager().saveBoss(boss);
                     player.sendActionBar(Component.text("Boss erfolgreich abgespeichert!").color(NamedTextColor.GRAY));
                 });
                 sendMessage(player, "<green>Der Boss wurde erfolgreich erstellt!");
@@ -203,7 +206,12 @@ public class BossCreator {
                             return;
                         }
                     }), this::onCancel);
-
+                }
+                case 10 -> {
+                    sendMessage(player, "Lege die Belohnungen für den Boss fest");
+                    new LootListCreator(bossSystem.plugin(), player, (loots) -> {
+                        bossBuilder.lootList(loots);
+                    }, new LootFactory(new EconomyFactory().createEconomy()));
                 }
 
                 default -> {

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.security.SecureRandom;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -19,7 +20,9 @@ public record LootChancedItem(@NotNull ItemStack itemStack, @Range(from = 0, to 
             Iterator<Player> iterator = players.iterator();
             for (ItemStack itemStack : ItemUtil.splitItem(itemStack, players.size())) {
                 if (itemStack == null) continue;
-                iterator.next().getInventory().addItem(itemStack);
+                Player player = iterator.next();
+                player.getInventory().addItem(itemStack);
+                player.sendMessage(MessageFormat.format("§8- §7{0}§8x§7{1}", itemStack.getAmount(), itemStack.getType()));
             }
         }
     }

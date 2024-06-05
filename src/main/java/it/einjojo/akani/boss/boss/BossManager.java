@@ -9,8 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 public class BossManager {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BossManager.class);
@@ -60,65 +60,49 @@ public class BossManager {
 
     }
 
-    public CompletableFuture<Boolean> saveBoss(Boss boss) {
-        return CompletableFuture.supplyAsync(() -> {
-            logger.info("Saving boss {}", boss.id());
-            try {
-                storage.saveBoss(boss);
-            } catch (StorageException e) {
-                throw new RuntimeException(e);
-            }
+    public boolean saveBoss(Boss boss) {
+        logger.info("Saving boss {}", boss.id());
+        try {
+            storage.saveBoss(boss);
             return true;
-        }).exceptionally(throwable -> {
-            logger.error("Failed to save boss {}", boss.id());
-            throwable.fillInStackTrace();
+        } catch (StorageException e) {
+            logger.error("Failed to save boss {}", boss.id(), e);
             return false;
-        });
+        }
     }
 
-    public CompletableFuture<Boss> load(String id) {
+    public void load(String id) {
         Boss existing = boss(id);
         if (existing != null) {
             unregisterBoss(existing);
         }
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                return storage.loadBoss(id);
-            } catch (StorageException e) {
-                throw new RuntimeException(e);
-            }
-        }).thenApply(boss -> {
+        try {
+            Boss boss = storage.loadBoss(id);
             if (boss != null) {
                 registerBoss(boss);
             }
-            return boss;
-        }).exceptionally(throwable -> {
-            logger.error("Failed to load boss {}", id);
-            throwable.fillInStackTrace();
-            return null;
-        });
+        } catch (Exception e) {
+            logger.error("Failed to load boss {}", id, e);
+        }
     }
 
 
-    public CompletableFuture<Boolean> loadAll() {
+    public void loadAll() {
         for (Boss boss : bosses.values()) {
             unregisterBoss(boss);
         }
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                return storage.loadAllBosses();
-            } catch (StorageException e) {
-                throw new RuntimeException(e);
+        try {
+            List<Boss> bosses = storage.loadAllBosses();
+            for (Boss boss : bosses) {
+                if (boss == null) continue;
+                registerBoss(boss);
+
             }
-        }).thenApply((list) -> {
-            list.forEach(this::registerBoss);
-            logger.info("Loaded {} bosses", list.size());
-            return true;
-        }).exceptionally(throwable -> {
-            logger.error("Failed to load bosses");
-            throwable.fillInStackTrace();
-            return false;
-        });
+            logger.info("Loaded {} bosses", bosses.size());
+        } catch (StorageException e) {
+            logger.error("Failed to load bosses", e);
+        }
+
 
     }
 

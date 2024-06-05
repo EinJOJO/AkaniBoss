@@ -8,8 +8,12 @@ import dev.rollczi.litecommands.annotations.execute.Execute;
 import it.einjojo.akani.boss.BossSystem;
 import it.einjojo.akani.boss.boss.Boss;
 import it.einjojo.akani.boss.input.creator.BossCreator;
+import it.einjojo.akani.boss.input.creator.LootListCreator;
+import it.einjojo.akani.boss.integration.economy.EconomyFactory;
+import it.einjojo.akani.boss.loot.LootFactory;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -62,9 +66,21 @@ public class BossCommand {
 
     }
 
-    @Execute(name = "test")
-    public void test(@Context CommandSender executor) {
-
+    @Execute(name = "loot add")
+    public void setup(@Context Player executor, @Arg("boss") String bossId) {
+        new LootListCreator(bossSystem.plugin(), executor, (list) -> {
+            Boss boss = bossSystem.bossManager().boss(bossId);
+            if (boss == null) {
+                executor.sendMessage(BOSS_NOT_FOUND);
+                return;
+            }
+            boss.lootList().addAll(list);
+            executor.sendMessage(miniMessage.deserialize("<green>Die Loot Liste wurde erfolgreich hinzugefügt!"));
+            Bukkit.getScheduler().runTaskAsynchronously(bossSystem.plugin(), () -> {
+                bossSystem.bossManager().saveBoss(boss);
+                executor.sendMessage(miniMessage.deserialize("<green>Der Boss wurde gespeichert!"));
+            });
+        }, new LootFactory(new EconomyFactory().createEconomy()));
     }
 
 }

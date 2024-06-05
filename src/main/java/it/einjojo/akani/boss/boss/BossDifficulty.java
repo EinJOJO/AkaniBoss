@@ -25,7 +25,7 @@ public enum BossDifficulty {
     }
 
     public Component toComponent() {
-        return LegacyComponentSerializer.legacyAmpersand().deserialize(legacyText);
+        return LegacyComponentSerializer.legacySection().deserialize(legacyText);
     }
 
 }

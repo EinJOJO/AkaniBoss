@@ -156,45 +156,52 @@ public class RoomManager {
      */
     public CompletableFuture<Void> cleanupWorldContainer() {
         return CompletableFuture.runAsync(() -> {
-            List<World> unloadCheck = new LinkedList<>();
-            try (Stream<Path> stream = Files.walk(Bukkit.getWorldContainer().toPath())) {
-                stream.filter(path -> path.getFileName().toString().startsWith(ActiveRoom.WORLD_NAME_PREFIX)).forEach(worldPath -> {
-                    String worldName = worldPath.getFileName().toString();
-                    World world = Bukkit.getWorld(worldName);
-                    if (world == null) {
-                        try {
-                            FileUtil.deleteFolder(worldPath);
-                            log.info("Deleted world folder {}", worldPath);
-                        } catch (IOException ignore) {
-                        }
-                        return;
-                    }
-                    // Only delete worlds that are not used by any player
-                    if (world.getPlayerCount() == 0) {
-                        toBeDeletedWorldName.add(worldName);
-                        unloadCheck.add(world);
-                        log.info("World {} is not used by any player, will be deleted", worldName);
-                    }
-                });
+            try (Stream<Path> stream = Files.walk(Bukkit.getWorldContainer().toPath(), 1)) {
+                stream.filter(path -> path.getFileName().toString().startsWith(ActiveRoom.WORLD_NAME_PREFIX))
+                        .forEach(this::processWorldPath);
             } catch (IOException e) {
                 plugin.getLogger().severe("Failed to cleanup world container: " + e.getMessage());
                 throw new RuntimeException(e);
             }
-            if (unloadCheck.isEmpty()) {
-                return;
-            }
-            // Sync unload worlds
-            plugin.getServer().getScheduler().runTask(plugin, () -> {
-                unloadCheck.forEach((world) -> {
-                    Bukkit.unloadWorld(world, false);
-                });
-            });
-            return;
+            unloadWorlds();
         }).exceptionally((e) -> {
             plugin.getLogger().severe("Failed to cleanup world container: " + e.getMessage());
             e.fillInStackTrace();
             return null;
         });
+    }
+
+    private void processWorldPath(Path worldPath) {
+        String worldName = worldPath.getFileName().toString();
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) {
+            deleteFolder(worldPath);
+        } else if (world.getPlayerCount() == 0) {
+            toBeDeletedWorldName.add(worldName);
+            log.info("World {} is not used by any player, will be deleted", worldName);
+        }
+    }
+
+    private void deleteFolder(Path worldPath) {
+        try {
+            FileUtil.deleteFolder(worldPath);
+            log.info("Deleted world folder {}", worldPath);
+        } catch (IOException ignore) {
+        }
+    }
+
+    private void unloadWorlds() {
+        if (!toBeDeletedWorldName.isEmpty()) {
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                toBeDeletedWorldName.forEach(worldName -> {
+                    World world = Bukkit.getWorld(worldName);
+                    if (world != null) {
+                        Bukkit.unloadWorld(world, false);
+                    }
+                    toBeDeletedWorldName.remove(worldName);
+                });
+            });
+        }
     }
 
 }

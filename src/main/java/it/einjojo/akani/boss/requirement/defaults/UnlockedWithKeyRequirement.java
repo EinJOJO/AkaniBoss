@@ -35,10 +35,6 @@ public class UnlockedWithKeyRequirement implements Requirement {
         return NAME;
     }
 
-    @Override
-    public String requirementName() {
-        return NAME;
-    }
 
 
 }

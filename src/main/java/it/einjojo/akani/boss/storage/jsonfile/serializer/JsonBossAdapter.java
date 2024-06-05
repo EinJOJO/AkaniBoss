@@ -35,7 +35,7 @@ public class JsonBossAdapter implements Adapter<Boss> {
         }
         object.add("requirements", requirements);
         object.add("boundingBox", context.serialize(src.dungeonEntrance()));
-        object.add("itemStack", context.serialize(src.keyItem()));
+        object.add("item", context.serialize(src.keyItem()));
         object.add("mob", context.serialize(src.bossMob()));
         JsonArray lootArray = new JsonArray();
         for (Loot loot : src.lootList()) {
@@ -76,6 +76,12 @@ public class JsonBossAdapter implements Adapter<Boss> {
             logger.warning("Invalid world for key location: " + keyLocation.getWorld().getName());
             return null;
         }
+
+        ItemStack itemStack = context.deserialize(object.get("item"), ItemStack.class);
+        if (itemStack == null) {
+            logger.warning("Invalid item for boss: " + object.get("name").getAsString());
+            return null;
+        }
         return new Boss(
                 object.get("id").getAsString(),
                 object.get("name").getAsString(),
@@ -85,7 +91,7 @@ public class JsonBossAdapter implements Adapter<Boss> {
                 keyLocation,
                 requirements,
                 context.deserialize(object.get("boundingBox"), BoundingBox.class),
-                context.deserialize(object.get("itemStack"), ItemStack.class),
+                itemStack,
                 object.has("mob") ? context.deserialize(object.get("mob"), BossMob.class) : new VanillaMobFactory().createBossMob("SLIME"),
                 lootList
         );

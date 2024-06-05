@@ -120,10 +120,12 @@ public class FightListener implements Listener, BossFight.Listener {
             player.sendMessage(miniMessage().deserialize("<yellow>Zeit: <green><time> Sekunden",
                     Placeholder.parsed("time", String.valueOf(Duration.ofMillis(System.currentTimeMillis() - fight.startedAt()).toSeconds()))
             ));
+            player.sendMessage(miniMessage().deserialize("<yellow>Belohnungen :" + fight.boss().lootList().size()));
         }
         for (Loot loot : fight.boss().lootList()) {
             loot.grant(allParticipants);
         }
+
         spawnFireworks(fight.boss().keyRedeemLocation());
     }
 
